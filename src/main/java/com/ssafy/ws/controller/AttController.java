@@ -36,98 +36,93 @@ import java.io.FileReader;
 @RequiredArgsConstructor
 public class AttController {
 	private final AttServiceImpl aService;
-	
+
 	@GetMapping("/list")
-    private String registMemberForm() {
-        return "att/att-list-form";
-    }
-	
-	@PostMapping("/search")
-	public String searchAtt(@RequestParam("sido") String sido, @RequestParam("gugun") String gungu, @RequestParam("contentType") int contentType, Model model) {
-		try {
-	        List<Att> atts = aService.searchAtt(sido, gungu, contentType);
-	        model.addAttribute("atts", atts);
-	        return "att/att-list-form";
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        model.addAttribute("error", e.getMessage());
-	        return "att/att-list-form";
-	    }
+	private String registMemberForm() {
+		return "att/att-list-form";
 	}
-	
+
+	@PostMapping("/search")
+	public String searchAtt(@RequestParam("sido") String sido, @RequestParam("gugun") String gungu,
+			@RequestParam("contentType") int contentType, Model model) {
+		try {
+			List<Att> atts = aService.searchAtt(sido, gungu, contentType);
+			model.addAttribute("atts", atts);
+			return "att/att-list-form";
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", e.getMessage());
+			return "att/att-list-form";
+		}
+	}
 
 	@PostMapping("/search-parking")
-    private String searchParking(@RequestParam("lat") double lat, @RequestParam("lng") double lon,
-                                 @RequestParam("name") String name, @RequestParam("id") int id,
-                                 @RequestParam("image") String first_image1, Model model) throws IOException {
-        try {
-        	
-        	ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
-        	Reader reader = new InputStreamReader(resource.getInputStream());
-            List<Parking> allParkings = ParkingJsonParser.parse(reader);
-            List<Parking> nearby = findNearbyParkings(lat, lon, allParkings);
+	private String searchParking(@RequestParam("lat") double lat, @RequestParam("lng") double lon,
+			@RequestParam("name") String name, @RequestParam("id") int id, @RequestParam("image") String first_image1,
+			Model model) throws IOException {
+		try {
 
-            model.addAttribute("parkings", nearby);
-            model.addAttribute("lat", lat);
-            model.addAttribute("lng", lon);
-            model.addAttribute("name", name);
-            model.addAttribute("id", id);
-            model.addAttribute("image", first_image1);
+			ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
+			Reader reader = new InputStreamReader(resource.getInputStream());
+			List<Parking> allParkings = ParkingJsonParser.parse(reader);
+			List<Parking> nearby = findNearbyParkings(lat, lon, allParkings);
 
-            return "att/att-list-form";
+			model.addAttribute("parkings", nearby);
+			model.addAttribute("lat", lat);
+			model.addAttribute("lng", lon);
+			model.addAttribute("name", name);
+			model.addAttribute("id", id);
+			model.addAttribute("image", first_image1);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("error", "주차장 조회 중 오류 발생: " + e.getMessage());
-            return "att/att-list-form";
-        }
-    }
-    
-    public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371; // 지구 반지름 km
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                 * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
-    
+			return "att/att-list-form";
 
-    public static List<Parking> findNearbyParkings(double attLat, double attLon, List<Parking> allParkings) {
-        List<Parking> filtered = new ArrayList<>();
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", "주차장 조회 중 오류 발생: " + e.getMessage());
+			return "att/att-list-form";
+		}
+	}
 
-        for (Parking p : allParkings) {
-        	double distance = calculateDistance(attLat, attLon, p.getLatitude(), p.getLongitude());
-            if (distance <= 1.0) { // 1km 이내만
-                p.setDistance(distance);
-                filtered.add(p);
-            }
-        }
+	public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+		final int R = 6371; // 지구 반지름 km
+		double dLat = Math.toRadians(lat2 - lat1);
+		double dLon = Math.toRadians(lon2 - lon1);
+		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
+				* Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		return R * c;
+	}
 
-        return filtered.stream()
-            .sorted(Comparator.comparingDouble(p -> p.distance))
-            .limit(10)
-            .collect(Collectors.toList());
-    }
-    
-    @PostMapping("/attplan")
-    private String showAttplan(@RequestParam("sido") String sido, @RequestParam("gugun") String gugun, @RequestParam("att_id") int att_id, Model model) throws SQLException {
-    	
-    	List<Att> atts;
-    	if(att_id == 0) {
-    		atts = aService.searchAttLocation(sido, gugun);
-    	}
-    	else {
-    		atts = aService.searchAtt(sido, gugun, att_id);
-    	}
-    	
-    	model.addAttribute("atts", atts);
-    	model.addAttribute("selectedAttId", att_id);
+	public static List<Parking> findNearbyParkings(double attLat, double attLon, List<Parking> allParkings) {
+		List<Parking> filtered = new ArrayList<>();
 
-    	return "att/attplan";
-    }
-    
+		for (Parking p : allParkings) {
+			double distance = calculateDistance(attLat, attLon, p.getLatitude(), p.getLongitude());
+			if (distance <= 1.0) { // 1km 이내만
+				p.setDistance(distance);
+				filtered.add(p);
+			}
+		}
+
+		return filtered.stream().sorted(Comparator.comparingDouble(p -> p.distance)).limit(10)
+				.collect(Collectors.toList());
+	}
+
+	@PostMapping("/attplan")
+	private String showAttplan(@RequestParam("sido") String sido, @RequestParam("gugun") String gugun,
+			@RequestParam("att_id") int att_id, Model model) throws SQLException {
+
+		List<Att> atts;
+		if (att_id == 0) {
+			atts = aService.searchAttLocation(sido, gugun);
+		} else {
+			atts = aService.searchAtt(sido, gugun, att_id);
+		}
+
+		model.addAttribute("atts", atts);
+		model.addAttribute("selectedAttId", att_id);
+
+		return "att/attplan";
+	}
+
 }
-
