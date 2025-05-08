@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .reddot{
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <div>
+      <label for="">법정동 기반의 서비스(HappyHouse): </label>
+
+      <select id="sido">
+        <option value="" selected disabled>시도 선택</option>
+      </select>
+      <select id="gugun">
+        <option value="" selected disabled>구군 선택</option>
+      </select>
+      <select id="dong">
+        <option value="" selected disabled>읍면동 선택</option>
+      </select>
+      <input type="month" id="dealYmd" />
+      <button id="btn_apt_search">아파트 조회</button>
+    </div> -->
+    <hr />
+    <div>
+      <label for="">지역 코드 기반의 서비스(Enjoy Trip): </label>
+      <select id="areaCode">
+        <option value="" selected disabled>시도 선택</option>
+      </select>
+      <select id="sigunguCode">
+        <option value="" selected disabled>시군구 선택</option>
+      </select>
+      <select id="contentType">
+        <option value="" selected disabled>관광타입 선택</option>
+        <option value="12">관광지</option>
+        <option value="14">문화시설</option>
+        <option value="15">축제공연행사</option>
+        <option value="25">여행코스</option>
+        <option value="28">레포츠</option>
+        <option value="32">숙박</option>
+        <option value="38">쇼핑</option>
+        <option value="39">음식점</option>
+      </select>
+      <button id="btn_trip_search">관광지 조회</button>
+    </div>
+    <hr />
+    <div id="map" style="width: 100%; height: 500px"></div>
+  </body>
+  <!--서비스 ID 설정-->
+  <script
+    type="text/javascript"
+    src="https://sgisapi.kostat.go.kr/OpenAPI3/auth/javascriptAuth?consumer_key=2ae4315b5ef0419fa28c"
+  ></script>
+  <script src="/01_api/js/keys.js"></script>
+  <script src="/01_api/js/common.js"></script>
+  <script src="/01_api/js/kostat.js"></script>
+  <script src="/01_api/js/happyHouse.js"></script>
+  <script src="/01_api/js/enjoytrip.js"></script>
+  <script>
+    const init = async () => {
+      updateSido(); // happyHouse.js
+      areaCode1(); // enjoytrip.js
+      updateMap([
+        {
+          address: "서울특별시 강남구 테헤란로 212",
+          utmk: await getCoords("서울특별시 강남구 테헤란로 212"),
+          label: "멀티캠퍼스",
+        },
+      ]);
+      //{ address: address, utmk: getCoords(address), label: aptNm }
+    };
+    init();
+  </script>
+</html>
