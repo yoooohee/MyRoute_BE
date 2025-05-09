@@ -38,7 +38,7 @@ public interface MemberDao {
 	 * @param member(id, pw만 존재)
 	 * @return
 	 */
-	public Member login(Member member);
+	public Member login(String id);
 	
 	/**
 	 * 비밀번호 찾기

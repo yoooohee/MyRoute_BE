@@ -4,48 +4,19 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ssafy.ws.model.dao.MemberDao">
-    <!-- 회원 등록 -->
-    <insert id="memberRegister" parameterType="Member">
-        INSERT INTO MEMBER (NAME, EMAIL, ID, PASSWORD, PNUMBER, ROLE)
-        VALUES (#{name}, #{email}, #{id}, #{password}, #{pnumber}, #{role})
-    </insert>
+	<!-- 회원 등록 -->
+	<insert id="memberRegister" parameterType="Member">
+		INSERT INTO MEMBER
+		(NAME, EMAIL, ID, PASSWORD, PNUMBER, ROLE)
+		VALUES (#{name}, #{email},
+		#{id}, #{password}, #{pnumber}, #{role})
+	</insert>
 
-    <!-- 회원 정보 수정 -->
-    <update id="memberInfoUpdate" parameterType="Member">
-        UPDATE MEMBER
-        SET NAME = #{name}, EMAIL = #{email}, PASSWORD = #{password}, PNUMBER = #{pnumber}
-        WHERE ID = #{id}
-    </update>
-
-    <!-- 마이페이지 정보 조회 -->
-    <select id="getMypageInfo" parameterType="Member" resultType="Member">
-        SELECT NAME, EMAIL, ID, PNUMBER
-        FROM MEMBER
-        WHERE ID = #{id}
-    </select>
-
-    <!-- 회원 탈퇴 -->
-    <delete id="unRegisterMember" parameterType="Member">
-        DELETE FROM MEMBER WHERE ID = #{id}
-    </delete>
-
-    <!-- 로그인 -->
-    <select id="login" parameterType="Member" resultType="Member">
-        SELECT NAME, ID, PASSWORD, ROLE
-        FROM MEMBER
-        WHERE ID = #{id}
-    </select>
-
-    <!-- 비밀번호 찾기 -->
-    <select id="findPassword" parameterType="Member" resultType="Member">
-        SELECT PASSWORD
-        FROM MEMBER
-        WHERE NAME = #{name} AND ID = #{id} AND EMAIL = #{email}
-    </select>
-
-    <!-- 전체 회원 조회 -->
-    <select id="findAll" resultType="Member">
-        SELECT NAME, EMAIL, ID, PASSWORD, PNUMBER, ROLE
-        FROM MEMBER
-    </select>
+	<!-- 로그인 -->
+	<select id="login" resultType="Member">
+		SELECT ID, NAME, EMAIL, PASSWORD,
+		PNUMBER, ROLE
+		FROM MEMBER
+		WHERE ID = #{id}
+	</select>
 </mapper>
