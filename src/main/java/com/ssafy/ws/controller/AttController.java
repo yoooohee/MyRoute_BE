@@ -5,34 +5,31 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson;
 import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Parking;
 import com.ssafy.ws.model.service.AttServiceImpl;
 import com.ssafy.ws.util.ParkingJsonParser;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import java.io.Reader;
 import java.sql.SQLException;
-import java.io.FileReader;
 
 @Controller
-@RequestMapping("/att")
+@RequestMapping("/api/att")
 @RequiredArgsConstructor
 public class AttController {
 	private final AttServiceImpl aService;
@@ -43,10 +40,10 @@ public class AttController {
 	}
 
 	@PostMapping("/search")
-	public String searchAtt(@RequestParam("sido") String sido, @RequestParam("gugun") String gungu,
-			@RequestParam("contentType") int contentType, Model model) {
+	public String searchAtt(@RequestParam String sido, @RequestParam String gugun, @RequestParam int contentType,
+			Model model) {
 		try {
-			List<Att> atts = aService.searchAtt(sido, gungu, contentType);
+			List<Att> atts = aService.searchAtt(sido, gugun, contentType);
 			model.addAttribute("atts", atts);
 			return "att/att-list-form";
 		} catch (Exception e) {
@@ -57,9 +54,8 @@ public class AttController {
 	}
 
 	@PostMapping("/search-parking")
-	private String searchParking(@RequestParam("lat") double lat, @RequestParam("lng") double lon,
-			@RequestParam("name") String name, @RequestParam("id") int id, @RequestParam("image") String first_image1,
-			Model model) throws IOException {
+	private String searchParking(@RequestParam double lat, @RequestParam double lon, @RequestParam String name,
+			@RequestParam int id, @RequestParam("image") String first_image1, Model model) throws IOException {
 		try {
 
 			ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
@@ -109,20 +105,21 @@ public class AttController {
 	}
 
 	@PostMapping("/attplan")
-	private String showAttplan(@RequestParam("sido") String sido, @RequestParam("gugun") String gugun,
-			@RequestParam("att_id") int att_id, Model model) throws SQLException {
+	@ResponseBody
+	public ResponseEntity<List<Att>> getAttractions(@RequestBody Map<String, Object> params) throws SQLException {
+		String sido = (String) params.get("sido");
+		String gugun = (String) params.get("gugun");
+		int attId = (int) params.get("att_id");
+
+		System.out.println("sido = " + sido + ", gugun = " + gugun + ", att_id = " + attId);
 
 		List<Att> atts;
-		if (att_id == 0) {
+		if (attId == 0) {
 			atts = aService.searchAttLocation(sido, gugun);
 		} else {
-			atts = aService.searchAtt(sido, gugun, att_id);
+			atts = aService.searchAtt(sido, gugun, attId);
 		}
 
-		model.addAttribute("atts", atts);
-		model.addAttribute("selectedAttId", att_id);
-
-		return "att/attplan";
+		return ResponseEntity.ok(atts);
 	}
-
 }
