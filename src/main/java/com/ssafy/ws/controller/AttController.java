@@ -11,14 +11,15 @@ import java.util.stream.Collectors;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Parking;
@@ -32,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.Reader;
 import java.sql.SQLException;
 
-@Controller
+@RestController
 @RequestMapping("/api/att")
 @RequiredArgsConstructor
 public class AttController {
@@ -58,24 +59,18 @@ public class AttController {
 	}
 
 	@PostMapping("/search-parking")
-	@ResponseBody
-	public ResponseEntity<?> searchParkingJson(
-	        @RequestParam double lat,
-	        @RequestParam double lon
-	) throws IOException {
-	    try {
-	        ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
-	        Reader reader = new InputStreamReader(resource.getInputStream());
-	        List<Parking> allParkings = ParkingJsonParser.parse(reader);
-	        List<Parking> nearby = findNearbyParkings(lat, lon, allParkings);
+	public ResponseEntity<?> searchParkingJson(@RequestParam double lat, @RequestParam double lon) throws IOException {
+		try {
+			ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
+			Reader reader = new InputStreamReader(resource.getInputStream());
+			List<Parking> allParkings = ParkingJsonParser.parse(reader);
+			List<Parking> nearby = findNearbyParkings(lat, lon, allParkings);
 
-	        return ResponseEntity.ok(nearby); // JSON 응답
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body("주차장 조회 실패: " + e.getMessage());
-	    }
+			return ResponseEntity.ok(nearby); // JSON 응답
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주차장 조회 실패: " + e.getMessage());
+		}
 	}
-
 
 	public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
 		final int R = 6371; // 지구 반지름 km
@@ -103,7 +98,6 @@ public class AttController {
 	}
 
 	@PostMapping("/attplan")
-	@ResponseBody
 	public ResponseEntity<List<Att>> getAttractions(@RequestBody Map<String, Object> params) throws SQLException {
 		String sido = (String) params.get("sido");
 		String gugun = (String) params.get("gugun");
@@ -120,46 +114,41 @@ public class AttController {
 
 		return ResponseEntity.ok(atts);
 	}
-	
+
 	@PostMapping("/savePlan")
-    public ResponseEntity<String> savePlan(@RequestBody Map<String, Object> request, HttpSession session) throws SQLException {
-		String memberId = (String) session.getAttribute("id");
-	    if (memberId == null) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-	    }
-		
+	public ResponseEntity<String> savePlan(@RequestBody Map<String, Object> request, HttpSession session)
+			throws SQLException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		}
+
+		String memberId = authentication.getName();
+
 		String title = (String) request.get("title");
-        int days = (int) request.get("days");
-        int budget = (int) request.get("budget");
-        String sido = (String) request.get("sido");
-        int areacode = aService.sidonum(sido);
-        
+		int days = (int) request.get("days");
+		int budget = (int) request.get("budget");
+		String sido = (String) request.get("sido");
+		int areacode = aService.sidonum(sido);
 
-        // TODO: memberId, areaCode는 임시값 or 실제 값으로 수정
-        Plan plan = Plan.builder()
-                .planName(title)
-                .memberId(memberId)
-                .budget(budget)
-                .areaCode(areacode)
-                .days(days)
-                .build();
+		// TODO: memberId, areaCode는 임시값 or 실제 값으로 수정
+		Plan plan = Plan.builder().planName(title).memberId(memberId).budget(budget).areaCode(areacode).days(days)
+				.build();
 
-        List<Map<String, Object>> planItems = (List<Map<String, Object>>) request.get("plans");
-        List<Place> places = new ArrayList<>();
+		List<Map<String, Object>> planItems = (List<Map<String, Object>>) request.get("plans");
+		List<Place> places = new ArrayList<>();
 
-        for (int i = 0; i < planItems.size(); i++) {
-            Map<String, Object> item = planItems.get(i);
-            Integer attNo = (Integer) item.get("no");
+		for (int i = 0; i < planItems.size(); i++) {
+			Map<String, Object> item = planItems.get(i);
+			Integer attNo = (Integer) item.get("no");
 
-            Place place = Place.builder()
-                    .attractionNo(attNo)
-                    .visitOrder(i + 1)
-                    .build();
-            places.add(place);
-        }
+			Place place = Place.builder().attractionNo(attNo).visitOrder(i + 1).build();
+			places.add(place);
+		}
 
-        aService.savePlan(plan, places);
+		aService.savePlan(plan, places);
 
-        return ResponseEntity.ok("저장 성공");
-    }
+		return ResponseEntity.ok("저장 성공");
+	}
 }

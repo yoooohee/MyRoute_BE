@@ -34,7 +34,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -56,7 +55,6 @@
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
@@ -65,12 +63,10 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
         </dependency>
-
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
@@ -85,17 +81,41 @@
             <artifactId>mybatis-spring-boot-starter-test</artifactId>
             <version>3.0.4</version>
         </dependency>
-        
          <dependency>
 		    <groupId>org.mindrot</groupId>
 		    <artifactId>jbcrypt</artifactId>
 		    <version>0.4</version>
 		</dependency>
-		
 		<dependency>
 		    <groupId>com.google.code.gson</groupId>
 		    <artifactId>gson</artifactId>
 		    <version>2.10.1</version> <!-- or latest -->
+		</dependency>
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-api</artifactId>
+    		<version>0.11.5</version>
+		</dependency>
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-impl</artifactId>
+    		<version>0.11.5</version>
+		    <scope>runtime</scope>
+		</dependency>
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-jackson</artifactId>
+    		<version>0.11.5</version>
+		    <scope>runtime</scope>
+		</dependency>
+		<dependency>
+  			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+  			<optional>true</optional>
+		</dependency>
+		<dependency>
+	 		<groupId>org.springframework.boot</groupId>
+  			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
     </dependencies>
 

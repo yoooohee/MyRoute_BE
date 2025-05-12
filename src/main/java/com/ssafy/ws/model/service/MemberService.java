@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.ws.model.dao.MemberDao;
 import com.ssafy.ws.model.dto.Member;
+import com.ssafy.ws.model.dto.request.LoginRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,15 +23,13 @@ public class MemberService {
 		return dao.unRegisterMember(member);
 	}
 
-	public Member login(Member input) {
+	public Member login(LoginRequest input) {
 		Member dbMember = dao.login(input.getId());
 		if (dbMember == null) {
-			System.out.println("조회안됨");
 			return null;
 		}
 
 		if (!dbMember.isPasswordMatch(input.getPassword())) {
-			System.out.println("비번 틀림");
 			return null;
 		}
 
