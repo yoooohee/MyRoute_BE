@@ -58,30 +58,24 @@ public class AttController {
 	}
 
 	@PostMapping("/search-parking")
-	private String searchParking(@RequestParam double lat, @RequestParam double lon, @RequestParam String name,
-			@RequestParam int id, @RequestParam("image") String first_image1, Model model) throws IOException {
-		try {
+	@ResponseBody
+	public ResponseEntity<?> searchParkingJson(
+	        @RequestParam double lat,
+	        @RequestParam double lon
+	) throws IOException {
+	    try {
+	        ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
+	        Reader reader = new InputStreamReader(resource.getInputStream());
+	        List<Parking> allParkings = ParkingJsonParser.parse(reader);
+	        List<Parking> nearby = findNearbyParkings(lat, lon, allParkings);
 
-			ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
-			Reader reader = new InputStreamReader(resource.getInputStream());
-			List<Parking> allParkings = ParkingJsonParser.parse(reader);
-			List<Parking> nearby = findNearbyParkings(lat, lon, allParkings);
-
-			model.addAttribute("parkings", nearby);
-			model.addAttribute("lat", lat);
-			model.addAttribute("lng", lon);
-			model.addAttribute("name", name);
-			model.addAttribute("id", id);
-			model.addAttribute("image", first_image1);
-
-			return "att/att-list-form";
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			model.addAttribute("error", "주차장 조회 중 오류 발생: " + e.getMessage());
-			return "att/att-list-form";
-		}
+	        return ResponseEntity.ok(nearby); // JSON 응답
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("주차장 조회 실패: " + e.getMessage());
+	    }
 	}
+
 
 	public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
 		final int R = 6371; // 지구 반지름 km
