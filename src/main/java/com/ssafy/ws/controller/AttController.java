@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +22,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Parking;
+import com.ssafy.ws.model.dto.Place;
+import com.ssafy.ws.model.dto.Plan;
 import com.ssafy.ws.model.service.AttServiceImpl;
 import com.ssafy.ws.util.ParkingJsonParser;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import java.io.Reader;
 import java.sql.SQLException;
@@ -122,4 +126,46 @@ public class AttController {
 
 		return ResponseEntity.ok(atts);
 	}
+	
+	@PostMapping("/savePlan")
+    public ResponseEntity<String> savePlan(@RequestBody Map<String, Object> request, HttpSession session) throws SQLException {
+		String memberId = (String) session.getAttribute("id");
+	    if (memberId == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+		
+		String title = (String) request.get("title");
+        int days = (int) request.get("days");
+        int budget = (int) request.get("budget");
+        String sido = (String) request.get("sido");
+        int areacode = aService.sidonum(sido);
+        
+
+        // TODO: memberId, areaCode는 임시값 or 실제 값으로 수정
+        Plan plan = Plan.builder()
+                .planName(title)
+                .memberId(memberId)
+                .budget(budget)
+                .areaCode(areacode)
+                .days(days)
+                .build();
+
+        List<Map<String, Object>> planItems = (List<Map<String, Object>>) request.get("plans");
+        List<Place> places = new ArrayList<>();
+
+        for (int i = 0; i < planItems.size(); i++) {
+            Map<String, Object> item = planItems.get(i);
+            Integer attNo = (Integer) item.get("no");
+
+            Place place = Place.builder()
+                    .attractionNo(attNo)
+                    .visitOrder(i + 1)
+                    .build();
+            places.add(place);
+        }
+
+        aService.savePlan(plan, places);
+
+        return ResponseEntity.ok("저장 성공");
+    }
 }

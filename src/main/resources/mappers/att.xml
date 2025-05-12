@@ -17,6 +17,24 @@ select a.no, a.title, b.content_type_id, b.content_type_name, c.sido_name, d.gug
 	    			join guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code = d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun} and b.content_type_id not in (32, 39)
 </select>
 
+<select id="sidonum" parameterType="string" resultType="int">
+select sido_code from sidos where sido_name = #{sido}
+</select>
+
+ <insert id="insertPlan" useGeneratedKeys="true" keyProperty="planId">
+    INSERT INTO plan (plan_name, member_id, budget, area_code, days)
+    VALUES (#{planName}, #{memberId}, #{budget}, #{areaCode}, #{days})
+  </insert>
+
+  <!-- 장소 목록 저장 -->
+  <insert id="insertPlace">
+    INSERT INTO place (plan_id, attraction_no, visit_order)
+    VALUES
+    <foreach collection="places" item="p" separator=",">
+      (#{p.planId}, #{p.attractionNo}, #{p.visitOrder})
+    </foreach>
+  </insert>
+
 	<resultMap type="Att" id="attMap">
 	<id column="no" property="no"/>
 	<result column="title" property="title"/>
