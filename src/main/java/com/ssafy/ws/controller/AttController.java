@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Parking;
 import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
+import com.ssafy.ws.model.dto.response.PlanDetailResponse;
 import com.ssafy.ws.model.service.AttServiceImpl;
 import com.ssafy.ws.util.ParkingJsonParser;
 
@@ -151,4 +153,45 @@ public class AttController {
 
 		return ResponseEntity.ok("저장 성공");
 	}
+	
+	@GetMapping("/planlist")
+	public ResponseEntity<?> myPlanList() throws SQLException {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName();
+	    
+	    List<Plan> plans = aService.getPlanByUserId(memberId);
+	    
+	    return ResponseEntity.ok(plans);
+	}
+	
+	@GetMapping("/plan/{planId}")
+	public ResponseEntity<?> getPlanDetail(@PathVariable int planId) throws SQLException {
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    Plan plan = aService.getPlanById(planId);
+	    if (plan == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 계획이 존재하지 않습니다.");
+	    }
+	    
+	    List<Place> places = aService.getPlacesByPlanId(planId);
+
+	    PlanDetailResponse response = PlanDetailResponse.builder()
+	        .plan(plan)
+	        .places(places)
+	        .build();
+	    
+	    System.out.println(planId);
+
+	    return ResponseEntity.ok(response);
+	}
+
+
 }

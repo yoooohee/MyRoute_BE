@@ -11,7 +11,8 @@ select a.no, a.title, b.content_type_id, b.content_type_name, c.sido_name, d.gug
 </select>
 
 <select id="searchAttLocation" resultMap="attMap">
-select a.no, a.title, b.content_type_id, b.content_type_name, c.sido_name, d.gugun_name, a.overview, a.latitude, a.longitude, a.first_image1, a.addr1 from attractions a
+select a.no, a.title, b.content_type_id, b.content_type_name, c.sido_name, d.gugun_name, a.overview, a.latitude, a.longitude, a.first_image1, a.addr1 
+					from attractions a
 	    			join contenttypes b on (a.content_type_id = b.content_type_id)
 	    			join sidos c on (a.area_code = c.sido_code)
 	    			join guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code = d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun} and b.content_type_id not in (32, 39)
@@ -34,6 +35,21 @@ select sido_code from sidos where sido_name = #{sido}
       (#{p.planId}, #{p.attractionNo}, #{p.visitOrder})
     </foreach>
   </insert>
+  
+  <select id="getPlanByUserId" resultMap="planMap">
+select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days 
+from plan a join sidos b on (a.area_code = b.sido_code) where a.member_id=#{userId}
+</select>
+
+<select id= "getPlanById" resultMap="planMap">
+select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days 
+from plan a join sidos b on (a.area_code = b.sido_code) where a.plan_id=#{planId}
+</select>
+
+<select id= "getPlacesByPlanId" resultMap = "placeMap">
+select a.plan_id, a.attraction_no, a.visit_order, b.latitude, b.longitude, b.title, b.first_image1, b.addr1
+from place a join attractions b on a.attraction_no = b.no where plan_id = #{planId}
+</select>
 
 	<resultMap type="Att" id="attMap">
 	<id column="no" property="no"/>
@@ -45,6 +61,26 @@ select sido_code from sidos where sido_name = #{sido}
 	<result column="overview" property="overview"/>
 	<result column="latitude" property="latitude"/>
 	<result column="longitude" property="longitude"/>
+	<result column="first_image1" property="first_image1"/>
+	<result column="addr1" property="addr1"/>
+	</resultMap>
+	
+	<resultMap type="Plan" id="planMap">
+	<id column="plan_id" property="planId"/>
+	<result column="plan_name" property="planName"/>
+	<result column="member_id" property="memberId"/>
+	<result column="budget" property="budget"/>
+	<result column="sido_name" property="areaName"/>
+	<result column="days" property="days"/>
+	</resultMap>
+	
+	<resultMap type="Place" id="placeMap">
+	<result column="plan_id" property="planId"/>
+	<result column="attraction_no" property="attractionNo"/>
+	<result column="visit_order" property="visitOrder"/>
+	<result column="latitude" property="latitude"/>
+	<result column="longitude" property="longitude"/>
+	<result column="title" property="placeName"/>
 	<result column="first_image1" property="first_image1"/>
 	<result column="addr1" property="addr1"/>
 	</resultMap>

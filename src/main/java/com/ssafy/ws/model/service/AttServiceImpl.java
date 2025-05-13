@@ -45,5 +45,20 @@ public class AttServiceImpl implements AttService {
 
         dao.insertPlace(places);
     }
+	 
+	 @Override
+	 public List<Plan> getPlanByUserId(String userId) throws SQLException {
+		 return dao.getPlanByUserId(userId);
+	 }
+	 
+	 @Override
+	 public Plan getPlanById(int planId) throws SQLException {
+		 return dao.getPlanById(planId); 
+	 }
+	 
+	 @Override
+	 public List<Place> getPlacesByPlanId(int planId) throws SQLException {
+		 return dao.getPlacesByPlanId(planId);
+	 }
 
 }

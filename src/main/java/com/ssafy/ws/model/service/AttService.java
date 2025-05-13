@@ -13,4 +13,8 @@ public interface AttService {
 	List<Att> searchAttLocation(String sido, String gugun) throws SQLException;
 	int sidonum(String sido) throws SQLException;
 	void savePlan(Plan plan, List<Place> places) throws SQLException;
+	List<Plan> getPlanByUserId(String userId) throws SQLException;
+	Plan getPlanById(int planId) throws SQLException;
+	List<Place> getPlacesByPlanId(int planId) throws SQLException;
+	
 }

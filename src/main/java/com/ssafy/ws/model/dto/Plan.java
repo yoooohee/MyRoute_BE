@@ -15,5 +15,6 @@ public class Plan {
 	private String memberId;
 	private int budget;
 	private Integer areaCode;
+	private String areaName;
 	private Integer days;
 }

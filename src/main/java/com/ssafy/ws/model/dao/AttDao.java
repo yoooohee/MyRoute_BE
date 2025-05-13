@@ -15,4 +15,7 @@ public interface AttDao {
 	int sidonum(String sido);
 	int insertPlan(Plan plan);
     int insertPlace(List<Place> places);
+    List<Plan> getPlanByUserId(String userId);
+    Plan getPlanById(int planId);
+    List<Place> getPlacesByPlanId(int planId);
 }

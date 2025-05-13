@@ -14,4 +14,9 @@ public class Place {
 	private Integer planId;
 	private Integer attractionNo;
 	private Integer visitOrder;
+    private double latitude; //위도
+    private double longitude; //경도
+    private String placeName;
+    private String first_image1;
+    private String addr1;
 }
