@@ -26,6 +26,10 @@ import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Parking;
 import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
+import com.ssafy.ws.model.dto.request.AttPlanRequest;
+import com.ssafy.ws.model.dto.request.ParkingSearchRequest;
+import com.ssafy.ws.model.dto.request.PlaceRequest;
+import com.ssafy.ws.model.dto.request.PlanSaveRequest;
 import com.ssafy.ws.model.dto.response.PlanDetailResponse;
 import com.ssafy.ws.model.service.AttServiceImpl;
 import com.ssafy.ws.util.ParkingJsonParser;
@@ -61,21 +65,22 @@ public class AttController {
 	}
 
 	@PostMapping("/search-parking")
-	public ResponseEntity<?> searchParkingJson(@RequestParam double lat, @RequestParam double lon) throws IOException {
+	public ResponseEntity<?> searchParkingJson(@RequestBody ParkingSearchRequest request) throws IOException {
 		try {
 			ClassPathResource resource = new ClassPathResource("/static/resource/parking.json");
 			Reader reader = new InputStreamReader(resource.getInputStream());
 			List<Parking> allParkings = ParkingJsonParser.parse(reader);
-			List<Parking> nearby = findNearbyParkings(lat, lon, allParkings);
+			
+			List<Parking> nearby = findNearbyParkings(request.getLat(), request.getLon(), allParkings);
 
-			return ResponseEntity.ok(nearby); // JSON 응답
+			return ResponseEntity.ok(nearby);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주차장 조회 실패: " + e.getMessage());
 		}
 	}
 
 	public static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-		final int R = 6371; // 지구 반지름 km
+		final int R = 6371;
 		double dLat = Math.toRadians(lat2 - lat1);
 		double dLon = Math.toRadians(lon2 - lon1);
 		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
@@ -89,7 +94,7 @@ public class AttController {
 
 		for (Parking p : allParkings) {
 			double distance = calculateDistance(attLat, attLon, p.getLatitude(), p.getLongitude());
-			if (distance <= 1.0) { // 1km 이내만
+			if (distance <= 1.0) {
 				p.setDistance(distance);
 				filtered.add(p);
 			}
@@ -100,12 +105,10 @@ public class AttController {
 	}
 
 	@PostMapping("/attplan")
-	public ResponseEntity<List<Att>> getAttractions(@RequestBody Map<String, Object> params) throws SQLException {
-		String sido = (String) params.get("sido");
-		String gugun = (String) params.get("gugun");
-		int attId = (int) params.get("att_id");
-
-		System.out.println("sido = " + sido + ", gugun = " + gugun + ", att_id = " + attId);
+	public ResponseEntity<List<Att>> getAttractions(@RequestBody AttPlanRequest request) throws SQLException {
+		String sido = request.getSido();
+	    String gugun = request.getGugun();
+	    int attId = request.getAtt_id();
 
 		List<Att> atts;
 		if (attId == 0) {
@@ -118,7 +121,7 @@ public class AttController {
 	}
 
 	@PostMapping("/savePlan")
-	public ResponseEntity<String> savePlan(@RequestBody Map<String, Object> request, HttpSession session)
+	public ResponseEntity<String> savePlan(@RequestBody PlanSaveRequest request)
 			throws SQLException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -128,26 +131,34 @@ public class AttController {
 
 		String memberId = authentication.getName();
 
-		String title = (String) request.get("title");
-		int days = (int) request.get("days");
-		int budget = (int) request.get("budget");
-		String sido = (String) request.get("sido");
-		int areacode = aService.sidonum(sido);
+		int areacode = aService.sidonum(request.getSido());
 
-		// TODO: memberId, areaCode는 임시값 or 실제 값으로 수정
-		Plan plan = Plan.builder().planName(title).memberId(memberId).budget(budget).areaCode(areacode).days(days)
-				.build();
+	    Plan plan = Plan.builder()
+	            .planName(request.getTitle())
+	            .memberId(memberId)
+	            .budget(request.getBudget())
+	            .areaCode(areacode)
+	            .days(request.getDays())
+	            .build();
 
-		List<Map<String, Object>> planItems = (List<Map<String, Object>>) request.get("plans");
 		List<Place> places = new ArrayList<>();
+		List<Place> inputPlaces = request.getPlaces();
 
-		for (int i = 0; i < planItems.size(); i++) {
-			Map<String, Object> item = planItems.get(i);
-			Integer attNo = (Integer) item.get("no");
+	    for (int i = 0; i < inputPlaces.size(); i++) {
+	        Place input = inputPlaces.get(i);
 
-			Place place = Place.builder().attractionNo(attNo).visitOrder(i + 1).build();
-			places.add(place);
-		}
+	        Place place = Place.builder()
+	                .attractionNo(input.getAttractionNo() != null ? input.getAttractionNo() : input.getPlaceId())
+	                .visitOrder(i + 1)
+	                .latitude(input.getLatitude())
+	                .longitude(input.getLongitude())
+	                .placeName(input.getPlaceName())
+	                .first_image1(input.getFirst_image1())
+	                .addr1(input.getAddr1())
+	                .build();
+
+	        places.add(place);
+	    }
 
 		aService.savePlan(plan, places);
 
