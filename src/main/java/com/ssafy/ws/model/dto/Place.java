@@ -19,4 +19,5 @@ public class Place {
     private String placeName;
     private String first_image1;
     private String addr1;
+    private String content_type_name;
 }

@@ -27,7 +27,6 @@ select sido_code from sidos where sido_name = #{sido}
     VALUES (#{planName}, #{memberId}, #{budget}, #{areaCode}, #{days})
   </insert>
 
-  <!-- 장소 목록 저장 -->
   <insert id="insertPlace">
     INSERT INTO place (plan_id, attraction_no, visit_order)
     VALUES
@@ -47,9 +46,27 @@ from plan a join sidos b on (a.area_code = b.sido_code) where a.plan_id=#{planId
 </select>
 
 <select id= "getPlacesByPlanId" resultMap = "placeMap">
-select a.plan_id, a.attraction_no, a.visit_order, b.latitude, b.longitude, b.title, b.first_image1, b.addr1
-from place a join attractions b on a.attraction_no = b.no where plan_id = #{planId}
+select a.plan_id, a.attraction_no, a.visit_order, b.latitude, b.longitude, b.title, b.first_image1, b.addr1, c.content_type_name
+from place a join attractions b on a.attraction_no = b.no join contenttypes c on b.content_type_id = c.content_type_id where plan_id = #{planId}
 </select>
+
+<delete id="deletePlaceByPlanId">
+  DELETE FROM place WHERE plan_id = #{planId}
+</delete>
+
+<delete id="deletePlanByPlanId">
+  DELETE FROM plan WHERE plan_id = #{planId}
+</delete>
+
+<update id="updatePlan">
+  UPDATE plan
+  SET plan_name = #{planName},
+      budget = #{budget},
+      days = #{days},
+      area_code = #{areaCode}
+  WHERE plan_id = #{planId}
+</update>
+
 
 	<resultMap type="Att" id="attMap">
 	<id column="no" property="no"/>
@@ -83,5 +100,6 @@ from place a join attractions b on a.attraction_no = b.no where plan_id = #{plan
 	<result column="title" property="placeName"/>
 	<result column="first_image1" property="first_image1"/>
 	<result column="addr1" property="addr1"/>
+	<result column="content_type_name" property="content_type_name"/>
 	</resultMap>
 </mapper>

@@ -1,7 +1,9 @@
 package com.ssafy.ws.model.service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import com.ssafy.ws.model.dao.AttDao;
 import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
+import com.ssafy.ws.model.dto.request.PlanSaveRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +39,7 @@ public class AttServiceImpl implements AttService {
 	 @Override
     @Transactional
     public void savePlan(Plan plan, List<Place> places) throws SQLException {
-		 dao.insertPlan(plan); // planId 자동 생성
+		 dao.insertPlan(plan);
 		 int planId = plan.getPlanId();
 
         for (Place place : places) {
@@ -59,6 +62,43 @@ public class AttServiceImpl implements AttService {
 	 @Override
 	 public List<Place> getPlacesByPlanId(int planId) throws SQLException {
 		 return dao.getPlacesByPlanId(planId);
+	 }
+	 
+	 @Override
+	 @Transactional
+	    public void updatePlan(int planId, PlanSaveRequest request) {
+	        Plan plan = dao.getPlanById(planId);
+	        int areacode = dao.sidonum(request.getSido());
+
+	        plan.setPlanName(request.getTitle());
+	        plan.setDays(request.getDays());
+	        plan.setBudget(request.getBudget());
+	        plan.setAreaCode(areacode);
+	        dao.updatePlan(plan);
+	        dao.deletePlaceByPlanId(planId);
+
+	        List<Place> newPlaces = new ArrayList<>();
+	        for (Place dto : request.getPlaces()) {
+	            Place place = new Place();
+	            place.setPlanId(planId);
+	            place.setAttractionNo(dto.getAttractionNo());
+	            place.setPlaceName(dto.getPlaceName());
+	            place.setAddr1(dto.getAddr1());
+	            place.setFirst_image1(dto.getFirst_image1());
+	            place.setLatitude(dto.getLatitude());
+	            place.setLongitude(dto.getLongitude());
+	            place.setVisitOrder(dto.getVisitOrder());
+
+	            newPlaces.add(place);
+	        }
+	        
+	        dao.insertPlace(newPlaces);
+	    }
+	 
+	 @Override
+	 public void deletePlan(int planId) {
+		 dao.deletePlaceByPlanId(planId);
+		 dao.deletePlanByPlanId(planId);
 	 }
 
 }

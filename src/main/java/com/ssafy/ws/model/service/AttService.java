@@ -6,6 +6,7 @@ import java.util.List;
 import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
+import com.ssafy.ws.model.dto.request.PlanSaveRequest;
 
 public interface AttService {
 
@@ -16,5 +17,7 @@ public interface AttService {
 	List<Plan> getPlanByUserId(String userId) throws SQLException;
 	Plan getPlanById(int planId) throws SQLException;
 	List<Place> getPlacesByPlanId(int planId) throws SQLException;
+	void updatePlan(int planId, PlanSaveRequest places) throws SQLException;
+	void deletePlan(int planId);
 	
 }

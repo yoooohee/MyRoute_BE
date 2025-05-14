@@ -18,4 +18,7 @@ public interface AttDao {
     List<Plan> getPlanByUserId(String userId);
     Plan getPlanById(int planId);
     List<Place> getPlacesByPlanId(int planId);
+    void deletePlaceByPlanId(int planId);
+    void deletePlanByPlanId(int planId);
+    void updatePlan(Plan plan);
 }

@@ -14,10 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -204,5 +207,26 @@ public class AttController {
 	    return ResponseEntity.ok(response);
 	}
 
+	@PutMapping("/updatePlan/{planId}")
+    public ResponseEntity<?> updatePlan(
+            @PathVariable int planId,
+            @RequestBody PlanSaveRequest request,
+            @RequestHeader("Authorization") String token
+    ) {
+        try {
+            aService.updatePlan(planId, request);
+            return ResponseEntity.ok().body("업데이트 완료");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("업데이트 실패: " + e.getMessage());
+        }
+    }
+	
+	@DeleteMapping("/deletePlan/{planId}")
+	public ResponseEntity<String> deletePlan(@PathVariable int planId) throws SQLException {
+	    aService.deletePlan(planId);
+
+	    return ResponseEntity.ok("삭제 완료");
+	}
 
 }
