@@ -1,6 +1,5 @@
 package com.ssafy.ws.controller;
 
-import java.util.EmptyStackException;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -8,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.ws.model.dto.Member;
@@ -47,7 +45,7 @@ public class AuthController {
 
 		String token = jwtUtil.generateToken(loginRequest.getId());
 		return ResponseEntity.ok()
-				.body(Map.of("token", token, "id", loginMember.getId(), "role", loginMember.getRole()));
+				.body(Map.of("token", token, "name", loginMember.getName(), "role", loginMember.getRole()));
 	}
 
 	@PostMapping("/send-code")

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.ssafy.ws.model.dao.MemberDao;
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.LoginRequest;
+import com.ssafy.ws.model.dto.response.MemberInfoResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +37,7 @@ public class MemberService {
 		return dbMember;
 	}
 
-	public Member findPassword(Member member) {
-		return dao.findPassword(member);
+	public MemberInfoResponse findMyInfoById(String id) {
+		return dao.findMyInfoById(id);
 	}
 }

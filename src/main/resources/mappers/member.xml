@@ -19,4 +19,12 @@
 		FROM MEMBER
 		WHERE ID = #{id}
 	</select>
+
+	<!-- 내 정보 조회 -->
+	<select id="findMyInfoById" resultType="MemberInfoResponse">
+		SELECT ID, NAME, PNUMBER,
+		EMAIL
+		FROM MEMBER
+		WHERE ID = #{id}
+	</select>
 </mapper>
