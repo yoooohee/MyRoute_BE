@@ -68,6 +68,10 @@ from place a join attractions b on a.attraction_no = b.no join contenttypes c on
   WHERE plan_id = #{planId}
 </update>
 
+  <select id="getPublicPlans" resultMap="planMap">
+select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public
+from plan a join sidos b on (a.area_code = b.sido_code) where a.is_public = 1
+</select>
 
 	<resultMap type="Att" id="attMap">
 	<id column="no" property="no"/>

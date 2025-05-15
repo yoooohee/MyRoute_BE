@@ -19,5 +19,6 @@ public interface AttService {
 	List<Place> getPlacesByPlanId(int planId) throws SQLException;
 	void updatePlan(int planId, PlanSaveRequest places) throws SQLException;
 	void deletePlan(int planId);
+	List<Plan> getPublicPlans() throws SQLException;
 	
 }

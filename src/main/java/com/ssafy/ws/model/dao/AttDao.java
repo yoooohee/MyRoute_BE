@@ -21,4 +21,5 @@ public interface AttDao {
     void deletePlaceByPlanId(int planId);
     void deletePlanByPlanId(int planId);
     void updatePlan(Plan plan);
+    List<Plan> getPublicPlans();
 }

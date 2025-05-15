@@ -229,5 +229,13 @@ public class AttController {
 
 	    return ResponseEntity.ok("삭제 완료");
 	}
+	
+	@GetMapping("/publicPlans")
+	public ResponseEntity<?> PublicPlans() throws SQLException {
+	    List<Plan> plans = aService.getPublicPlans();
+	    
+	    return ResponseEntity.ok(plans);
+	}
+	
 
 }

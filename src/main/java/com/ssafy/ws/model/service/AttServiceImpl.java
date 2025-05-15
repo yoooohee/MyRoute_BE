@@ -101,5 +101,10 @@ public class AttServiceImpl implements AttService {
 		 dao.deletePlaceByPlanId(planId);
 		 dao.deletePlanByPlanId(planId);
 	 }
+	 
+	 @Override
+	 public List<Plan> getPublicPlans() throws SQLException {
+		 return dao.getPublicPlans();
+	 }
 
 }
