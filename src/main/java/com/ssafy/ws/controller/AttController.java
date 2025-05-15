@@ -237,5 +237,24 @@ public class AttController {
 	    return ResponseEntity.ok(plans);
 	}
 	
+	@GetMapping("/publicplan/{planId}")
+	public ResponseEntity<?> getPublicPlanDetail(@PathVariable int planId) throws SQLException {
+	    Plan plan = aService.getPlanById(planId);
+	    if (plan == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 계획이 존재하지 않습니다.");
+	    }
+	    
+	    List<Place> places = aService.getPlacesByPlanId(planId);
+
+	    PlanDetailResponse response = PlanDetailResponse.builder()
+	        .plan(plan)
+	        .places(places)
+	        .build();
+	    
+	    System.out.println(planId);
+
+	    return ResponseEntity.ok(response);
+	}
+	
 
 }
