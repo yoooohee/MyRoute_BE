@@ -21,10 +21,28 @@
 	</select>
 
 	<!-- 내 정보 조회 -->
-	<select id="findMyInfoById" resultType="MemberInfoResponse">
-		SELECT ID, NAME, PNUMBER,
-		EMAIL
+	<select id="findById" resultType="Member">
+		SELECT ID, NAME, EMAIL,
+		PASSWORD, PNUMBER, ROLE
 		FROM MEMBER
 		WHERE ID = #{id}
 	</select>
+
+	<!-- 내 정보 변경 -->
+	<update id="updateMemberInfo">
+		UPDATE member
+		SET name = #{member.name},
+		email =
+		#{member.email},
+		pnumber = #{member.pnumber}
+		WHERE id = #{id}
+	</update>
+
+	<!-- 비밀번호 변경 -->
+	<update id="updatePassword">
+		UPDATE MEMBER
+		SET PASSWORD = #{password}
+		WHERE ID =
+		#{id}
+	</update>
 </mapper>

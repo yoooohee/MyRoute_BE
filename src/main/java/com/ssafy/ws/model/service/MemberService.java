@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import com.ssafy.ws.model.dao.MemberDao;
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.LoginRequest;
+import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
+import com.ssafy.ws.model.dto.request.PasswordModifyRequest;
 import com.ssafy.ws.model.dto.response.MemberInfoResponse;
+import com.ssafy.ws.util.PasswordUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +41,24 @@ public class MemberService {
 	}
 
 	public MemberInfoResponse findMyInfoById(String id) {
-		return dao.findMyInfoById(id);
+		Member member = dao.findById(id);
+		MemberInfoResponse response = new MemberInfoResponse(member.getId(), member.getName(), member.getEmail(),
+				member.getPnumber());
+
+		return response;
+	}
+
+	public void updateMemberInfo(String memberId, MemberUpdateRequest member) {
+		dao.updateMemberInfo(memberId, member);
+	}
+
+	public void updatePassword(String memberId, PasswordModifyRequest password) {
+		Member member = dao.findById(memberId);
+
+		if (!PasswordUtil.checkPassword(password.getCurrentPassword(), member.getPassword())) {
+			throw new IllegalArgumentException("기존 비밀번호가 일치하지 않습니다.");
+		}
+
+		dao.updatePassword(memberId, PasswordUtil.hashPassword(password.getNewPassword()));
 	}
 }

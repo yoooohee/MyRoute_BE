@@ -3,6 +3,7 @@ package com.ssafy.ws.model.dao;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.ws.model.dto.Member;
+import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
 import com.ssafy.ws.model.dto.response.MemberInfoResponse;
 
 @Mapper
@@ -43,4 +44,10 @@ public interface MemberDao {
 	 * @return
 	 */
 	public Member login(String id);
+
+	public int updateMemberInfo(String id, MemberUpdateRequest member);
+
+	public Member findById(String memberId);
+
+	public void updatePassword(String id, String password);
 }
