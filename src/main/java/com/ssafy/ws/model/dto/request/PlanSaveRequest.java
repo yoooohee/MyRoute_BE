@@ -15,4 +15,5 @@ public class PlanSaveRequest {
     private int budget;
     private String sido;
     private List<Place> places;
+    private int isPublic;
 }

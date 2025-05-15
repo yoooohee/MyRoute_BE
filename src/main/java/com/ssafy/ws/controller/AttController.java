@@ -142,6 +142,7 @@ public class AttController {
 	            .budget(request.getBudget())
 	            .areaCode(areacode)
 	            .days(request.getDays())
+	            .isPublic(request.getIsPublic())
 	            .build();
 
 		List<Place> places = new ArrayList<>();

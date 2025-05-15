@@ -74,6 +74,7 @@ public class AttServiceImpl implements AttService {
 	        plan.setDays(request.getDays());
 	        plan.setBudget(request.getBudget());
 	        plan.setAreaCode(areacode);
+	        plan.setIsPublic(request.getIsPublic());
 	        dao.updatePlan(plan);
 	        dao.deletePlaceByPlanId(planId);
 

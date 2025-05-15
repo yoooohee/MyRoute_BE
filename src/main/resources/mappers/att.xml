@@ -23,8 +23,8 @@ select sido_code from sidos where sido_name = #{sido}
 </select>
 
  <insert id="insertPlan" useGeneratedKeys="true" keyProperty="planId">
-    INSERT INTO plan (plan_name, member_id, budget, area_code, days)
-    VALUES (#{planName}, #{memberId}, #{budget}, #{areaCode}, #{days})
+    INSERT INTO plan (plan_name, member_id, budget, area_code, days, is_public)
+    VALUES (#{planName}, #{memberId}, #{budget}, #{areaCode}, #{days}, #{isPublic})
   </insert>
 
   <insert id="insertPlace">
@@ -36,12 +36,12 @@ select sido_code from sidos where sido_name = #{sido}
   </insert>
   
   <select id="getPlanByUserId" resultMap="planMap">
-select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days 
+select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public 
 from plan a join sidos b on (a.area_code = b.sido_code) where a.member_id=#{userId}
 </select>
 
 <select id= "getPlanById" resultMap="planMap">
-select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days 
+select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public
 from plan a join sidos b on (a.area_code = b.sido_code) where a.plan_id=#{planId}
 </select>
 
@@ -63,7 +63,8 @@ from place a join attractions b on a.attraction_no = b.no join contenttypes c on
   SET plan_name = #{planName},
       budget = #{budget},
       days = #{days},
-      area_code = #{areaCode}
+      area_code = #{areaCode},
+      is_public = #{isPublic}
   WHERE plan_id = #{planId}
 </update>
 
@@ -89,6 +90,7 @@ from place a join attractions b on a.attraction_no = b.no join contenttypes c on
 	<result column="budget" property="budget"/>
 	<result column="sido_name" property="areaName"/>
 	<result column="days" property="days"/>
+	<result column="is_public" property="isPublic"/>
 	</resultMap>
 	
 	<resultMap type="Place" id="placeMap">

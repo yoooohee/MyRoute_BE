@@ -17,4 +17,5 @@ public class Plan {
 	private Integer areaCode;
 	private String areaName;
 	private Integer days;
+	private int isPublic;
 }
