@@ -18,4 +18,5 @@ public class Plan {
 	private String areaName;
 	private Integer days;
 	private int isPublic;
+	private int likeCount;
 }

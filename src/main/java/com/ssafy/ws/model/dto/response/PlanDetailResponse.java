@@ -17,4 +17,5 @@ import com.ssafy.ws.model.dto.Plan;
 public class PlanDetailResponse {
     private Plan plan;
     private List<Place> places;
+    private boolean likedByUser;
 }

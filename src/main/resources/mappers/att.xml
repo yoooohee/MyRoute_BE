@@ -68,10 +68,36 @@ from place a join attractions b on a.attraction_no = b.no join contenttypes c on
   WHERE plan_id = #{planId}
 </update>
 
-  <select id="getPublicPlans" resultMap="planMap">
-select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public
+  <select id="getPublicPlans" resultMap="planWithLikeMap">
+select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public,
+ (SELECT COUNT(*) FROM plan_likes WHERE plan_id = a.plan_id) AS like_count
 from plan a join sidos b on (a.area_code = b.sido_code) where a.is_public = 1
 </select>
+
+ <insert id="Planlike">
+    INSERT INTO plan_likes (plan_id, member_id)
+    VALUES (#{planId}, #{memberId})
+  </insert>
+  
+  <delete id="Planlikecancel">
+  DELETE FROM plan_likes WHERE plan_id = #{planId} and member_id = #{memberId}
+</delete>
+
+<select id="getPlanByIdWithLike" resultMap="planWithLikeMap">
+  SELECT a.plan_id, a.plan_name, a.member_id, a.budget,
+         b.sido_name, a.days, a.is_public,
+         (SELECT COUNT(*) FROM plan_likes WHERE plan_id = a.plan_id) AS like_count
+  FROM plan a
+  JOIN sidos b ON a.area_code = b.sido_code
+  WHERE a.plan_id = #{planId}
+</select>
+
+<select id="hasUserLikedPlan" resultType="boolean">
+  SELECT COUNT(*) > 0
+  FROM plan_likes
+  WHERE plan_id = #{planId} AND member_id = #{memberId}
+</select>
+
 
 	<resultMap type="Att" id="attMap">
 	<id column="no" property="no"/>
@@ -108,4 +134,16 @@ from plan a join sidos b on (a.area_code = b.sido_code) where a.is_public = 1
 	<result column="addr1" property="addr1"/>
 	<result column="content_type_name" property="content_type_name"/>
 	</resultMap>
+	
+	<resultMap type="Plan" id="planWithLikeMap">
+  <id column="plan_id" property="planId"/>
+  <result column="plan_name" property="planName"/>
+  <result column="member_id" property="memberId"/>
+  <result column="budget" property="budget"/>
+  <result column="sido_name" property="areaName"/>
+  <result column="days" property="days"/>
+  <result column="is_public" property="isPublic"/>
+  <result column="like_count" property="likeCount"/>
+</resultMap>
+
 </mapper>

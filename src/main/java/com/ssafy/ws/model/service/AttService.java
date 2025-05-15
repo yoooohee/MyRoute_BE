@@ -20,5 +20,8 @@ public interface AttService {
 	void updatePlan(int planId, PlanSaveRequest places) throws SQLException;
 	void deletePlan(int planId);
 	List<Plan> getPublicPlans() throws SQLException;
-	
+	void Planlike(int planId, String userId) throws SQLException;
+	void Planlikecancel(int planId, String userId) throws SQLException;
+	Plan getPlanByIdWithLike(int planId) throws SQLException;
+	public boolean hasUserLikedPlan(int planId, String memberId);
 }

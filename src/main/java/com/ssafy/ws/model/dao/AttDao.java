@@ -3,6 +3,7 @@ package com.ssafy.ws.model.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Place;
@@ -22,4 +23,9 @@ public interface AttDao {
     void deletePlanByPlanId(int planId);
     void updatePlan(Plan plan);
     List<Plan> getPublicPlans();
+    void Planlike(int planId, String memberId);
+    void Planlikecancel(int planId, String memberId);
+    Plan getPlanByIdWithLike(int planId);
+    boolean hasUserLikedPlan(@Param("planId") int planId, @Param("memberId") String memberId);
+
 }

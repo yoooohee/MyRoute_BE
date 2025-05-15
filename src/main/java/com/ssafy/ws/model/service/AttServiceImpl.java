@@ -106,5 +106,25 @@ public class AttServiceImpl implements AttService {
 	 public List<Plan> getPublicPlans() throws SQLException {
 		 return dao.getPublicPlans();
 	 }
+	 
+	 @Override
+	 public void Planlike(int planId, String memberId) throws SQLException {
+		 dao.Planlike(planId, memberId);
+	 }
+	 
+	 @Override
+	 public void Planlikecancel(int planId, String memberId) throws SQLException {
+		 dao.Planlikecancel(planId, memberId);
+	 }
+	 
+	 @Override
+	 public Plan getPlanByIdWithLike(int planId) throws SQLException {
+		 return dao.getPlanByIdWithLike(planId);
+	 }
+	 
+	 @Override
+	 public boolean hasUserLikedPlan(int planId, String memberId) {
+	     return dao.hasUserLikedPlan(planId, memberId);
+	 }
 
 }

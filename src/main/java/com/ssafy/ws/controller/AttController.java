@@ -239,22 +239,65 @@ public class AttController {
 	
 	@GetMapping("/publicplan/{planId}")
 	public ResponseEntity<?> getPublicPlanDetail(@PathVariable int planId) throws SQLException {
-	    Plan plan = aService.getPlanById(planId);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String memberId = (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal()))
+	            ? authentication.getName()
+	            : null;
+	    
+		Plan plan = aService.getPlanByIdWithLike(planId);
 	    if (plan == null) {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 계획이 존재하지 않습니다.");
 	    }
 	    
 	    List<Place> places = aService.getPlacesByPlanId(planId);
 
+	    boolean likedByUser = false;
+	    if (memberId != null) {
+	        likedByUser = aService.hasUserLikedPlan(planId, memberId);
+	    }
+	    
 	    PlanDetailResponse response = PlanDetailResponse.builder()
 	        .plan(plan)
 	        .places(places)
+	        .likedByUser(likedByUser)
 	        .build();
 	    
-	    System.out.println(planId);
+	    System.out.println(plan.getLikeCount());
 
 	    return ResponseEntity.ok(response);
 	}
 	
+	@PostMapping("/planlike/{planId}")
+	public ResponseEntity<?> likePlan(@PathVariable int planId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName();
+
+	    try {
+	        aService.Planlike(planId, memberId);
+	        return ResponseEntity.ok("추천 완료");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("추천 처리 중 오류 발생");
+	    }
+	}
+
+	@PostMapping("/planlike/cancel/{planId}")
+	public ResponseEntity<?> cancelLike(@PathVariable int planId) throws SQLException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName();
+	    
+	    aService.Planlikecancel(planId, memberId);
+	    return ResponseEntity.ok("좋아요 취소 완료");
+	}
+
 
 }
