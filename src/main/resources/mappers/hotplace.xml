@@ -4,75 +4,64 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ssafy.ws.model.dao.HotplaceDao">
-     <!-- 핫플 목록 조회 -->
-    <select id="findAll" resultMap="hotplaceResultMap">
-        SELECT 
-            hotplace_id, member_id, attraction_no, title, star_point, created_at, image
-        FROM 
-            hotplace
-        ORDER BY 
-            created_at DESC
-        LIMIT #{offset}, #{limit}
-    </select>
-    
-    <!-- 핫플 단건 조회 -->
-    <select id="findById" resultType="com.ssafy.ws.model.dto.Hotplace">
-        SELECT 
-            hotplace_id, member_id, attraction_no, title, content, review_content, 
-            star_point, image, created_at, updated_at
-        FROM 
-            hotplace
-        WHERE 
-            hotplace_id = #{hotplaceId}
-    </select>
-    
-    <!-- 핫플 총 개수 조회 -->
-    <select id="count" resultType="int">
-        SELECT COUNT(*) FROM hotplace
-    </select>
-    
-    <!-- 핫플 등록 -->
-    <insert id="insert">
-        INSERT INTO hotplace (
-            member_id, attraction_no, title, content, review_content,
-            star_point, image, created_at, updated_at
-        )
-        VALUES (
-            #{memberId}, #{attractionNo}, #{title}, #{content}, #{reviewContent},
-            #{starPoint}, #{image}, NOW(), NOW()
-        )
-    </insert>
-    
-    <!-- 핫플 수정 -->
-    <update id="update">
-        UPDATE hotplace
-        SET 
-            title = #{title},
-            content = #{content},
-            review_content = #{reviewContent},
-            star_point = #{starPoint},
-            image = #{image},
-            updated_at = NOW()
-        WHERE 
-            hotplace_id = #{hotplaceId}
-    </update>
+     
+<select id="findAllAttractions" resultMap="attMap">
+select * from attractions;
+</select>
 
-    <!-- 핫플 삭제 -->
-    <delete id="delete">
-        DELETE FROM hotplace
-        WHERE hotplace_id = #{hotplaceId}
-    </delete>
-    
-    <resultMap id="hotplaceResultMap" type="com.ssafy.ws.model.dto.Hotplace">
-        <id property="hotplaceId" column="hotplace_id"/>
-        <result property="memberId" column="member_id"/>
-        <result property="attractionNo" column="attraction_no"/>
-        <result property="title" column="title"/>
-        <result property="content" column="content"/>
-        <result property="reviewContent" column="review_content"/>
-        <result property="starPoint" column="star_point"/>
-        <result property="image" column="image"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
+<insert id="createPost" parameterType="HotplacePost">
+  INSERT INTO hotplace (
+    member_id, attraction_no, title, star_point, content, image
+  ) VALUES (
+    #{memberId}, #{attractionNo}, #{title}, #{rating}, #{content}, #{image}
+  )
+</insert>
+
+<select id="getAllPosts" resultMap="hotplaceMap">
+  SELECT * from hotplace
+</select>
+
+<select id="getHotplaceById" resultMap="hotplacedetailMap">
+	select a.hotplace_id, a.member_id, a.title, b.title as attraction_title, a.content, a.created_at, a.updated_at, a.star_point, a.image
+	from hotplace a join attractions b on (a.attraction_no = b.no) where hotplace_id = #{hotplaceId}
+</select>
+
+<resultMap type="Att" id="attMap">
+	<id column="no" property="no"/>
+	<result column="title" property="title"/>
+	<result column="content_type_id" property="content_type_id"/>
+	<result column="content_type_name" property="content_type_name"/>
+	<result column="sido_name" property="sido_name"/>
+	<result column="gugun_name" property="gugun_name"/>
+	<result column="overview" property="overview"/>
+	<result column="latitude" property="latitude"/>
+	<result column="longitude" property="longitude"/>
+	<result column="first_image1" property="first_image1"/>
+	<result column="addr1" property="addr1"/>
+	</resultMap>
+	
+	<resultMap type="Hotplace" id="hotplaceMap">
+	<id column="hotplace_id" property="hotplaceId"/>
+	<result column="member_id" property="memberId"/>
+	<result column="attraction_no" property="attractionNo"/>
+	<result column="title" property="title"/>
+	<result column="content" property="content"/>
+	<result column="created_at" property="createdAt"/>
+	<result column="updated_at" property="updatedAt"/>
+	<result column="star_point" property="starPoint"/>
+	<result column="image" property="image"/>
+	</resultMap>
+	
+	<resultMap type="HotplaceDetailResponse" id="hotplacedetailMap">
+	<id column="hotplace_id" property="id"/>
+	<result column="member_id" property="memberId"/>
+	<result column="attraction_title" property="attractionName"/>
+	<result column="title" property="title"/>
+	<result column="content" property="content"/>
+	<result column="created_at" property="createdAt"/>
+	<result column="updated_at" property="updatedAt"/>
+	<result column="star_point" property="starPoint"/>
+	<result column="image" property="image"/>
+	</resultMap>
+	
 </mapper>

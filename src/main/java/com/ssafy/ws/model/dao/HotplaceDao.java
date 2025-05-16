@@ -3,20 +3,20 @@ package com.ssafy.ws.model.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Hotplace;
+import com.ssafy.ws.model.dto.response.HotplaceDetailResponse;
+import com.ssafy.ws.model.dto.response.HotplacePost;
 
 @Mapper
 public interface HotplaceDao {
-	public List<Hotplace> findAll(int offset, int limit);
 	
-	public Hotplace findById(int hotplaceId);
-	
-	public int count();
-	
-	public void insert(Hotplace hotplace);
-	
-	public void update(Hotplace hotplace);
-	
-	public void delete(int hotplaceId);
+	public List<Att> findAllAttractions();
+	void createPost(HotplacePost post);
+	List<Hotplace> getAllPosts();
+	HotplaceDetailResponse getHotplaceById(int hotplaceId);
+
 }
