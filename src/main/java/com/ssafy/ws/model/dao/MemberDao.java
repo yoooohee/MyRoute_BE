@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
+import com.ssafy.ws.model.dto.request.PasswordChangeRequest;
 import com.ssafy.ws.model.dto.response.MemberInfoResponse;
 
 @Mapper
@@ -50,4 +51,6 @@ public interface MemberDao {
 	public Member findById(String memberId);
 
 	public void updatePassword(String id, String password);
+
+	public void changePassword(PasswordChangeRequest request);
 }

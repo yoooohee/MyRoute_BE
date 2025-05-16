@@ -6,6 +6,7 @@ import com.ssafy.ws.model.dao.MemberDao;
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.LoginRequest;
 import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
+import com.ssafy.ws.model.dto.request.PasswordChangeRequest;
 import com.ssafy.ws.model.dto.request.PasswordModifyRequest;
 import com.ssafy.ws.model.dto.response.MemberInfoResponse;
 import com.ssafy.ws.util.PasswordUtil;
@@ -60,5 +61,17 @@ public class MemberService {
 		}
 
 		dao.updatePassword(memberId, PasswordUtil.hashPassword(password.getNewPassword()));
+	}
+
+	public void changePassword(PasswordChangeRequest request) {
+		String id = request.getId();
+		Member member = dao.findById(id);
+
+		if (!member.getEmail().equals(request.getEmail())) {
+			throw new IllegalArgumentException("일치하는 회원 정보가 없습니다.");
+		}
+
+		String password = request.getPassword();
+		dao.updatePassword(id, PasswordUtil.hashPassword(password));
 	}
 }

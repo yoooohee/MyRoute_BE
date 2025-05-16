@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.EmailVerificationReqeust;
 import com.ssafy.ws.model.dto.request.LoginRequest;
+import com.ssafy.ws.model.dto.request.PasswordChangeRequest;
 import com.ssafy.ws.model.dto.response.EmailVerificationResponse;
 import com.ssafy.ws.model.service.MailService;
 import com.ssafy.ws.model.service.MemberService;
@@ -70,4 +71,10 @@ public class AuthController {
 		}
 	}
 
+	@PostMapping("/reset-password")
+	public ResponseEntity<?> resetPassword(@RequestBody PasswordChangeRequest request) {
+		System.out.println("Hello");
+		service.changePassword(request);
+		return ResponseEntity.ok("비밀번호가 변경되었습니다.");
+	}
 }
