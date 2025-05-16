@@ -1,0 +1,12 @@
+package com.ssafy.ws.model.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class NoticeUpdateRequest {
+	private int noticeId;
+	private String title;
+	private String content;
+}

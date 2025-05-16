@@ -28,6 +28,8 @@ public class MemberController {
 	private ResponseEntity<?> findMyInfoById() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+		System.out.println("authentication: " + authentication);
+
 		if (authentication == null || !authentication.isAuthenticated()
 				|| authentication.getPrincipal().equals("anonymousUser")) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.ws.model.dao.NoticeDao">
+	<!-- 전체 조회 -->
+	<select id="findAll" resultType="Notice">
+		SELECT NOTICE_ID, TITLE,
+		CONTENT, CREATED_AT, UPDATED_AT
+		FROM NOTICE
+	</select>
+
+	<!-- 하나 조회 -->
+	<select id="findById" resultType="Notice">
+		SELECT NOTICE_ID, TITLE,
+		CONTENT, CREATED_AT, UPDATED_AT
+		FROM NOTICE
+		WHERE NOTICE_ID = #{id}
+	</select>
+
+	<!-- 등록 -->
+	<insert id="insert" parameterType="Notice">
+		INSERT INTO NOTICE (TITLE,
+		CONTENT)
+		VALUES (#{title}, #{content})
+	</insert>
+
+	<!-- 수정 -->
+	<update id="update" parameterType="NoticeUpdateRequest">
+		UPDATE NOTICE
+		SET TITLE =
+		#{title},
+		CONTENT = #{content},
+		WHERE NOTICE_ID = #{id}
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="delete">
+		DELETE FROM NOTICE
+		WHERE NOTICE_ID = #{id}
+	</delete>
+</mapper>
