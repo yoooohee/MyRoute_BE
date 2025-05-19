@@ -298,12 +298,4 @@ public class AttController {
 	    aService.Planlikecancel(planId, memberId);
 	    return ResponseEntity.ok("좋아요 취소 완료");
 	}
-	
-	@GetMapping("/hotplace/allAttractions")
-    public ResponseEntity<List<Att>> getAllAttractions() throws SQLException {
-        List<Att> attractions = aService.findAllAttractions();
-        return ResponseEntity.ok(attractions);
-    }
-
-
 }

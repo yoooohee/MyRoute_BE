@@ -1,5 +1,6 @@
 package com.ssafy.ws.model.dao;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -17,6 +18,9 @@ public interface HotplaceDao {
 	public List<Att> findAllAttractions();
 	void createPost(HotplacePost post);
 	List<Hotplace> getAllPosts();
-	HotplaceDetailResponse getHotplaceById(int hotplaceId);
+	Hotplace getHotplaceById(int hotplaceId);
+	void Hotplacelike(int hotplaceId, String memberId) throws SQLException;
+	void Hotplacelikecancel(int hotplaceId, String memberId) throws SQLException;
+	public boolean hasUserLikedHotplace(int hotplaceId, String memberId);
 
 }

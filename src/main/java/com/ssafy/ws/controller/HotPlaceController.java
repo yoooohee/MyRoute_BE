@@ -58,80 +58,127 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 public class HotPlaceController {
 	private final HotplaceServiceImpl hService;
-	
+
 	@GetMapping("/allAttractions")
-    public ResponseEntity<List<Att>> getAllAttractions() throws SQLException {
-        List<Att> attractions = hService.findAllAttractions();
-        return ResponseEntity.ok(attractions);
-    }
-	
+	public ResponseEntity<List<Att>> getAllAttractions() throws SQLException {
+		List<Att> attractions = hService.findAllAttractions();
+		return ResponseEntity.ok(attractions);
+	}
+
 	@PostMapping("/upload")
-    public ResponseEntity<?> createPost(
-            @RequestParam("no") int attractionNo,
-            @RequestParam("title") String title,
-            @RequestParam("rating") double rating,
-            @RequestParam("content") String content,
-            @RequestParam(value = "images", required = false) MultipartFile images,
-            @RequestParam("writerId") String memberId
-    ) {
+	public ResponseEntity<?> createPost(@RequestParam("no") int attractionNo, @RequestParam("title") String title,
+			@RequestParam("rating") double rating, @RequestParam("content") String content,
+			@RequestParam(value = "images", required = false) MultipartFile images,
+			@RequestParam("writerId") String memberId) {
 		byte[] imageBytes = null;
-	    if (images != null && !images.isEmpty()) {
-	        try {
-	            imageBytes = images.getBytes();
-	        } catch (IOException e) {
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패");
-	        }
-	    }
+		if (images != null && !images.isEmpty()) {
+			try {
+				imageBytes = images.getBytes();
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패");
+			}
+		}
 
-        HotplacePost post = new HotplacePost();
-        post.setMemberId(memberId);
-        post.setAttractionNo(attractionNo);
-        post.setTitle(title);
-        post.setRating(rating); 
-        post.setContent(content);
-        post.setImage(imageBytes); 
+		HotplacePost post = new HotplacePost();
+		post.setMemberId(memberId);
+		post.setAttractionNo(attractionNo);
+		post.setTitle(title);
+		post.setRating(rating);
+		post.setContent(content);
+		post.setImage(imageBytes);
 
-        hService.createPost(post);
-        return ResponseEntity.ok().build();
-    }
-	
+		hService.createPost(post);
+		return ResponseEntity.ok().build();
+	}
+
 	@GetMapping("/posts")
 	public ResponseEntity<List<Hotplace>> getAllHotplacePosts() {
-	    List<Hotplace> posts = hService.getAllPosts();
-	    return ResponseEntity.ok(posts);
+		List<Hotplace> posts = hService.getAllPosts();
+		return ResponseEntity.ok(posts);
 	}
 
 	@GetMapping("/detail/{hotplaceId}")
 	public ResponseEntity<?> gethotplaceDetail(@PathVariable int hotplaceId) throws SQLException {
-	    HotplaceDetailResponse detail = hService.getHotplaceById(hotplaceId);
-	    if (detail == null) {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String memberId = (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal()))
+	            ? authentication.getName()
+	            : null;
+
+	    boolean likedByUser = false;
+	    if (memberId != null) {
+	        likedByUser = hService.hasUserLikedHotplace(hotplaceId, memberId);
+	    }
+
+	    Hotplace hotplace = hService.getHotplaceById(hotplaceId);
+	    if (hotplace == null) {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물이 존재하지 않습니다.");
 	    }
-	    
-	    if (detail.getImage() != null) {
-	        try {
-	            String mimeType = java.net.URLConnection.guessContentTypeFromStream(
-	                new java.io.ByteArrayInputStream(detail.getImage())
-	            );
 
+	    String mimeType = "image/jpeg";
+	    byte[] imageBytes = hotplace.getImage();
+	    if (imageBytes != null) {
+	        try {
+	            mimeType = java.net.URLConnection.guessContentTypeFromStream(new java.io.ByteArrayInputStream(imageBytes));
 	            if (mimeType == null) {
-	                String str = new String(detail.getImage());
+	                String str = new String(imageBytes);
 	                if (str.trim().startsWith("<svg")) {
 	                    mimeType = "image/svg+xml";
-	                } else {
-	                    mimeType = "image/jpeg";
 	                }
 	            }
-
-	            String base64Image = Base64.getEncoder().encodeToString(detail.getImage());
-	            detail.setImageBase64("data:" + mimeType + ";base64," + base64Image);
-	            detail.setImage(null);
 	        } catch (IOException e) {
 	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 오류");
 	        }
 	    }
 
+	    String imageBase64 = (imageBytes != null)
+	        ? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
+	        : null;
 
-	    return ResponseEntity.ok(detail);
+	    HotplaceDetailResponse response = HotplaceDetailResponse.builder()
+	        .hotplace(hotplace)
+	        .likedByUser(likedByUser)
+	        .imageBase64(imageBase64)
+	        .build();
+	    
+	    if (response.getHotplace() != null) {
+	        response.getHotplace().setImage(null);
+	    }
+
+	    return ResponseEntity.ok(response);
 	}
+
+	
+	@PostMapping("/hotplacelike/{hotplaceId}")
+	public ResponseEntity<?> likeHotplace(@PathVariable int hotplaceId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName();
+
+
+	    try {
+	        hService.Hotplacelike(hotplaceId, memberId);
+	        return ResponseEntity.ok("추천 완료");
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("추천 처리 중 오류 발생");
+	    }
+	}
+
+	@PostMapping("/hotplacelike/cancel/{hotplaceId}")
+	public ResponseEntity<?> cancelLike(@PathVariable int hotplaceId) throws SQLException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName();
+	    
+	    hService.Hotplacelikecancel(hotplaceId, memberId);
+	    return ResponseEntity.ok("좋아요 취소 완료");
+	    }
 }

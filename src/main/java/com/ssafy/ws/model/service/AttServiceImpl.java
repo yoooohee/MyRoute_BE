@@ -127,9 +127,5 @@ public class AttServiceImpl implements AttService {
 	     return dao.hasUserLikedPlan(planId, memberId);
 	 }
 	 
-	 @Override
-	 public List<Att> findAllAttractions() throws SQLException {
-		 return dao.findAllAttractions();
-	 }
 
 }

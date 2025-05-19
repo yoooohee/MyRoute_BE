@@ -18,12 +18,31 @@ select * from attractions;
 </insert>
 
 <select id="getAllPosts" resultMap="hotplaceMap">
-  SELECT * from hotplace
+  SELECT a.*,  b.title as attraction_title, 
+         (SELECT COUNT(*) FROM hotplace_likes WHERE hotplace_id = a.hotplace_id) AS like_count
+  FROM hotplace a join attractions b on (a.attraction_no = b.no)
 </select>
 
-<select id="getHotplaceById" resultMap="hotplacedetailMap">
-	select a.hotplace_id, a.member_id, a.title, b.title as attraction_title, a.content, a.created_at, a.updated_at, a.star_point, a.image
+
+<select id="getHotplaceById" resultMap="hotplaceMap">
+	select a.hotplace_id, a.member_id, a.attraction_no, a.title, b.title as attraction_title, a.content, a.created_at, a.updated_at, a.star_point,
+	 a.image, (SELECT COUNT(*) FROM hotplace_likes WHERE hotplace_id = a.hotplace_id) AS like_count
 	from hotplace a join attractions b on (a.attraction_no = b.no) where hotplace_id = #{hotplaceId}
+</select>
+
+ <insert id="Hotplacelike">
+    INSERT INTO hotplace_likes (hotplace_id, member_id)
+    VALUES (#{hotplaceId}, #{memberId})
+  </insert>
+  
+  <delete id="Hotplacelikecancel">
+  DELETE FROM hotplace_likes WHERE hotplace_id = #{hotplaceId} and member_id = #{memberId}
+</delete>
+
+<select id="hasUserLikedHotplace" resultType="boolean">
+  SELECT COUNT(*) > 0
+  FROM hotplace_likes
+  WHERE hotplace_id = #{hotplaceId} AND member_id = #{memberId}
 </select>
 
 <resultMap type="Att" id="attMap">
@@ -44,17 +63,6 @@ select * from attractions;
 	<id column="hotplace_id" property="hotplaceId"/>
 	<result column="member_id" property="memberId"/>
 	<result column="attraction_no" property="attractionNo"/>
-	<result column="title" property="title"/>
-	<result column="content" property="content"/>
-	<result column="created_at" property="createdAt"/>
-	<result column="updated_at" property="updatedAt"/>
-	<result column="star_point" property="starPoint"/>
-	<result column="image" property="image"/>
-	</resultMap>
-	
-	<resultMap type="HotplaceDetailResponse" id="hotplacedetailMap">
-	<id column="hotplace_id" property="id"/>
-	<result column="member_id" property="memberId"/>
 	<result column="attraction_title" property="attractionName"/>
 	<result column="title" property="title"/>
 	<result column="content" property="content"/>
@@ -62,6 +70,8 @@ select * from attractions;
 	<result column="updated_at" property="updatedAt"/>
 	<result column="star_point" property="starPoint"/>
 	<result column="image" property="image"/>
+	<result column="like_count" property="likeCount"/>
 	</resultMap>
+
 	
 </mapper>

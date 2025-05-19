@@ -1,5 +1,6 @@
 package com.ssafy.ws.model.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -35,7 +36,22 @@ public class HotplaceServiceImpl implements HotplaceService {
 	}
 	
 	@Override
-	public HotplaceDetailResponse getHotplaceById(int hotplaceId) {
+	public Hotplace getHotplaceById(int hotplaceId) {
 		return hotplaceDao.getHotplaceById(hotplaceId);
+	}
+	
+	@Override
+	public void Hotplacelike(int hotplaceId, String memberId) throws SQLException {
+		hotplaceDao.Hotplacelike(hotplaceId, memberId);
+	}
+	
+	@Override
+	public void Hotplacelikecancel(int hotplaceId, String memberId) throws SQLException {
+		hotplaceDao.Hotplacelikecancel(hotplaceId, memberId);
+	}
+	
+	@Override
+	public boolean hasUserLikedHotplace(int hotplaceId, String memberId) {
+		return hotplaceDao.hasUserLikedHotplace(hotplaceId, memberId);
 	}
 }

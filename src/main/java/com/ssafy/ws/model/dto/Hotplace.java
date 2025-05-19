@@ -15,10 +15,12 @@ public class Hotplace {
 	private Integer hotplaceId;
 	private String memberId;
 	private Integer attractionNo;
+	private String attractionName;
 	private String title;
 	private String content;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private double starPoint;
 	private byte[] image;
+	private int likeCount;
 }
