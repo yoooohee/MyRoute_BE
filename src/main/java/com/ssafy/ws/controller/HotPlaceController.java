@@ -77,7 +77,7 @@ public class HotPlaceController {
 		byte[] imageBytes = null;
 	    if (images != null && !images.isEmpty()) {
 	        try {
-	            imageBytes = images.getBytes(); // 이미지 → byte[]
+	            imageBytes = images.getBytes();
 	        } catch (IOException e) {
 	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패");
 	        }
@@ -87,7 +87,7 @@ public class HotPlaceController {
         post.setMemberId(memberId);
         post.setAttractionNo(attractionNo);
         post.setTitle(title);
-        post.setRating(rating);
+        post.setRating(rating); 
         post.setContent(content);
         post.setImage(imageBytes); 
 
@@ -109,11 +109,28 @@ public class HotPlaceController {
 	    }
 	    
 	    if (detail.getImage() != null) {
-	        String base64Image = Base64.getEncoder().encodeToString(detail.getImage());
-	        detail.setImageBase64("data:image/jpeg;base64," + base64Image);
-	        System.out.println("image byte length = " + detail.getImageBase64());
-	        detail.setImage(null);
+	        try {
+	            String mimeType = java.net.URLConnection.guessContentTypeFromStream(
+	                new java.io.ByteArrayInputStream(detail.getImage())
+	            );
+
+	            if (mimeType == null) {
+	                String str = new String(detail.getImage());
+	                if (str.trim().startsWith("<svg")) {
+	                    mimeType = "image/svg+xml";
+	                } else {
+	                    mimeType = "image/jpeg";
+	                }
+	            }
+
+	            String base64Image = Base64.getEncoder().encodeToString(detail.getImage());
+	            detail.setImageBase64("data:" + mimeType + ";base64," + base64Image);
+	            detail.setImage(null);
+	        } catch (IOException e) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 오류");
+	        }
 	    }
+
 
 	    return ResponseEntity.ok(detail);
 	}
