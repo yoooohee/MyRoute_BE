@@ -41,6 +41,10 @@ public class MemberService {
 		return dbMember;
 	}
 
+	public Member findById(String id) {
+		return dao.findById(id);
+	}
+
 	public MemberInfoResponse findMyInfoById(String id) {
 		Member member = dao.findById(id);
 		MemberInfoResponse response = new MemberInfoResponse(member.getId(), member.getName(), member.getEmail(),

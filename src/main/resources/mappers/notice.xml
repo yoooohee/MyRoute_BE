@@ -9,6 +9,7 @@
 		SELECT NOTICE_ID, TITLE,
 		CONTENT, CREATED_AT, UPDATED_AT
 		FROM NOTICE
+		ORDER BY NOTICE_ID DESC
 	</select>
 
 	<!-- 하나 조회 -->
@@ -31,7 +32,7 @@
 		UPDATE NOTICE
 		SET TITLE =
 		#{title},
-		CONTENT = #{content},
+		CONTENT = #{content}
 		WHERE NOTICE_ID = #{id}
 	</update>
 
