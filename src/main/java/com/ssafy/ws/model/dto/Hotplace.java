@@ -17,7 +17,6 @@ public class Hotplace {
 	private Integer attractionNo;
 	private String title;
 	private String content;
-	private String reviewContent;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private Integer starPoint;

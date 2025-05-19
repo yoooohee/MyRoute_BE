@@ -27,5 +27,5 @@ public interface AttDao {
     void Planlikecancel(int planId, String memberId);
     Plan getPlanByIdWithLike(int planId);
     boolean hasUserLikedPlan(@Param("planId") int planId, @Param("memberId") String memberId);
-
+    List<Att> findAllAttractions();
 }
