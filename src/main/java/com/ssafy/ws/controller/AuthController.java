@@ -73,7 +73,6 @@ public class AuthController {
 
 	@PostMapping("/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestBody PasswordChangeRequest request) {
-		System.out.println("Hello");
 		service.changePassword(request);
 		return ResponseEntity.ok("비밀번호가 변경되었습니다.");
 	}

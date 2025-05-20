@@ -72,10 +72,9 @@ public class NoticeController {
 			throw new ResponseStatusException(FORBIDDEN, "로그인이 필요합니다.");
 		}
 
-		String userId = authentication.getName();
-		System.out.println("userId: " + userId);
+		String memberId = authentication.getName();
 
-		Member member = memberService.findById(userId);
+		Member member = memberService.findById(memberId);
 
 		if (!member.getRole().equals("ADMIN")) {
 			throw new ResponseStatusException(FORBIDDEN, "관리자 권한이 필요합니다.");
