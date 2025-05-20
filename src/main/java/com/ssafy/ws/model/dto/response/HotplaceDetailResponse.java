@@ -19,6 +19,7 @@ public class HotplaceDetailResponse {
     Hotplace hotplace;
     private String imageBase64;
 	private boolean likedByUser;
+    private boolean myPost;
 	
 	public String getImageBase64() {
         return imageBase64 != null ? imageBase64 :

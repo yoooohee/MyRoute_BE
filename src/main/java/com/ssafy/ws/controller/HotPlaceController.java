@@ -111,9 +111,11 @@ public class HotPlaceController {
 		String imageBase64 = (imageBytes != null)
 				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
 				: null;
+		
+		boolean myPost = memberId != null && memberId.equals(hotplace.getMemberId());
 
 		HotplaceDetailResponse response = HotplaceDetailResponse.builder().hotplace(hotplace).likedByUser(likedByUser)
-				.imageBase64(imageBase64).build();
+				.imageBase64(imageBase64).myPost(myPost).build();
 
 		if (response.getHotplace() != null) {
 			response.getHotplace().setImage(null);
