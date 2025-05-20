@@ -2,22 +2,29 @@ package com.ssafy.ws.controller;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.ws.model.dto.Att;
+import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
+import com.ssafy.ws.model.dto.request.CommentRequest;
 import com.ssafy.ws.model.dto.response.HotplaceDetailResponse;
 import com.ssafy.ws.model.dto.response.HotplacePost;
 import com.ssafy.ws.model.service.HotplaceServiceImpl;
@@ -163,4 +170,59 @@ public class HotPlaceController {
 
 		return ResponseEntity.ok(hService.findAllByMemberId(memberId));
 	}
+	
+	
+	@PostMapping("/posts/{hotplaceId}/comments")
+    public ResponseEntity<?> createComment(@PathVariable int hotplaceId,
+                                           @RequestBody CommentRequest request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication == null || !authentication.isAuthenticated()
+				|| authentication.getPrincipal().equals("anonymousUser")) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		}
+
+		String memberId = authentication.getName();
+		
+        if (memberId == null) return ResponseEntity.status(401).body("Unauthorized");
+
+        hService.addComment(hotplaceId, memberId, request.getContent());
+        return ResponseEntity.ok().build();
+    }
+
+	@GetMapping("/posts/{hotplaceId}/comments")
+	public ResponseEntity<?> getComments(@PathVariable int hotplaceId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String memberId = authentication.getName();
+
+	    List<Comment> comments = hService.getComments(hotplaceId);
+	    
+	    List<Map<String, Object>> result = comments.stream().map(c -> {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("commentId", c.getCommentId());
+	        map.put("memberId", c.getMemberId());
+	        map.put("content", c.getContent());
+	        map.put("createdAt", c.getCreatedAt());
+	        map.put("editable", memberId != null && memberId.equals(c.getMemberId()));
+	        return map;
+	    }).collect(Collectors.toList());
+
+	    return ResponseEntity.ok(result);
+	}
+
+	
+    @DeleteMapping("/commentdelete/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable int commentId) {
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication == null || !authentication.isAuthenticated()
+				|| authentication.getPrincipal().equals("anonymousUser")) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		}
+
+		String memberId = authentication.getName();
+        hService.deleteComment(commentId, memberId);
+        return ResponseEntity.ok().build();
+    }
+
 }

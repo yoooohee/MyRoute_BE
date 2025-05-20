@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.ws.model.dto.Att;
+import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.response.HotplacePost;
 
@@ -27,4 +28,10 @@ public interface HotplaceDao {
 	public boolean hasUserLikedHotplace(int hotplaceId, String memberId);
 
 	public List<Hotplace> findAllByMemberId(String memberId);
+	
+	void insertComment(Comment comment);
+	
+    List<Comment> getCommentsByHotplaceId(int hotplaceId);
+    
+    void deleteComment(int commentId, String memberId);
 }

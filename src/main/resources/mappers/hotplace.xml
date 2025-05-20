@@ -57,6 +57,24 @@
 		FROM hotplace a join attractions b on (a.attraction_no = b.no)
 		WHERE member_id = #{id}
 	</select>
+	
+	<insert id="insertComment">
+    INSERT INTO comment (hotplace_id, member_id, content, created_at)
+    VALUES (#{hotplaceId}, #{memberId}, #{content}, NOW())
+  </insert>
+
+  <select id="getCommentsByHotplaceId" resultMap="commentMap">
+    SELECT comment_id, hotplace_id, member_id, content, created_at
+    FROM comment
+    WHERE hotplace_id = #{hotplaceId}
+    ORDER BY created_at DESC
+  </select>
+  
+  <delete id="deleteComment">
+  DELETE FROM comment
+  WHERE comment_id = #{commentId} AND member_id = #{memberId}
+</delete>
+  
 
 	<resultMap type="Att" id="attMap">
 		<id column="no" property="no" />
@@ -86,5 +104,12 @@
 		<result column="like_count" property="likeCount" />
 	</resultMap>
 
+<resultMap type="Comment" id="commentMap">
+		<id column="comment_id" property="commentId" />
+		<result column="hotplace_id" property="hotplaceId" />
+		<result column="member_id" property="memberId" />
+		<result column="content" property="content" />
+		<result column="created_at" property="createdAt" />
+	</resultMap>
 
 </mapper>

@@ -17,4 +17,5 @@ public class Comment {
 	private String memberId;
 	private String content;
 	private LocalDateTime createdAt;
+	private boolean editable;
 }

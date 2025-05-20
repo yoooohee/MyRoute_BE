@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.ssafy.ws.model.dto.Att;
+import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.response.HotplacePost;
 
@@ -24,4 +25,8 @@ public interface HotplaceService {
 	public boolean hasUserLikedHotplace(int hotplaceId, String memberId);
 
 	public List<Hotplace> findAllByMemberId(String memberId);
+	
+	void addComment(int hotplaceId, String memberId, String content);
+	
+    List<Comment> getComments(int hotplaceId);
 }

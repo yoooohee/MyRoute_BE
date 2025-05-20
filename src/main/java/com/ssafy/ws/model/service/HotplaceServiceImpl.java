@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.ws.model.dao.HotplaceDao;
 import com.ssafy.ws.model.dto.Att;
+import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.response.HotplacePost;
 
@@ -56,5 +57,24 @@ public class HotplaceServiceImpl implements HotplaceService {
 	@Override
 	public List<Hotplace> findAllByMemberId(String id) {
 		return hotplaceDao.findAllByMemberId(id);
+	}
+	
+	@Override
+    public void addComment(int hotplaceId, String memberId, String content) {
+        Comment comment = Comment.builder()
+                .hotplaceId(hotplaceId)
+                .memberId(memberId)
+                .content(content)
+                .build();
+        hotplaceDao.insertComment(comment);
+    }
+
+    @Override
+    public List<Comment> getComments(int hotplaceId) {
+        return hotplaceDao.getCommentsByHotplaceId(hotplaceId);
+    }
+
+	public void deleteComment(int commentId, String memberId) {
+		hotplaceDao.deleteComment(commentId, memberId);
 	}
 }
