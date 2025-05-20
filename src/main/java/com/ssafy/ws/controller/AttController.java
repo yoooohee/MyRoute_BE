@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.ws.model.dto.Att;
@@ -184,30 +185,6 @@ public class AttController {
 	    return ResponseEntity.ok(plans);
 	}
 	
-	@GetMapping("/plan/{planId}")
-	public ResponseEntity<?> getPlanDetail(@PathVariable int planId) throws SQLException {
-	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-	    }
-
-	    Plan plan = aService.getPlanById(planId);
-	    if (plan == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 계획이 존재하지 않습니다.");
-	    }
-	    
-	    List<Place> places = aService.getPlacesByPlanId(planId);
-
-	    PlanDetailResponse response = PlanDetailResponse.builder()
-	        .plan(plan)
-	        .places(places)
-	        .build();
-	    
-	    System.out.println(planId);
-
-	    return ResponseEntity.ok(response);
-	}
-
 	@PutMapping("/updatePlan/{planId}")
     public ResponseEntity<?> updatePlan(
             @PathVariable int planId,
@@ -237,8 +214,8 @@ public class AttController {
 	    return ResponseEntity.ok(plans);
 	}
 	
-	@GetMapping("/publicplan/{planId}")
-	public ResponseEntity<?> getPublicPlanDetail(@PathVariable int planId) throws SQLException {
+	@GetMapping("/plan/{planId}")
+	public ResponseEntity<?> getPlanDetail(@PathVariable int planId) throws SQLException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    String memberId = (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal()))
 	            ? authentication.getName()
@@ -256,13 +233,14 @@ public class AttController {
 	        likedByUser = aService.hasUserLikedPlan(planId, memberId);
 	    }
 	    
+	    boolean myPost = memberId != null && memberId.equals(plan.getMemberId());
+	    
 	    PlanDetailResponse response = PlanDetailResponse.builder()
 	        .plan(plan)
 	        .places(places)
 	        .likedByUser(likedByUser)
+	        .myPost(myPost)
 	        .build();
-	    
-	    System.out.println(plan.getLikeCount());
 
 	    return ResponseEntity.ok(response);
 	}

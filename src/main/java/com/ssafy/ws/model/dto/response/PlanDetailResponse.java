@@ -18,4 +18,5 @@ public class PlanDetailResponse {
     private Plan plan;
     private List<Place> places;
     private boolean likedByUser;
+    private boolean myPost;
 }

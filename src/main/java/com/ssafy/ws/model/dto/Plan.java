@@ -1,5 +1,7 @@
 package com.ssafy.ws.model.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +21,6 @@ public class Plan {
 	private Integer days;
 	private int isPublic;
 	private int likeCount;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 }
