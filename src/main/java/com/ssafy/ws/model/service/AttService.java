@@ -24,4 +24,6 @@ public interface AttService {
 	void Planlikecancel(int planId, String userId) throws SQLException;
 	Plan getPlanByIdWithLike(int planId) throws SQLException;
 	public boolean hasUserLikedPlan(int planId, String memberId);
+	double getAvgRating(int attractionNo) throws SQLException;
+	
 }

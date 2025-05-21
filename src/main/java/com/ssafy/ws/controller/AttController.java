@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.core.io.ClassPathResource;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,8 +20,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.ws.model.dto.Att;
@@ -32,13 +28,11 @@ import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
 import com.ssafy.ws.model.dto.request.AttPlanRequest;
 import com.ssafy.ws.model.dto.request.ParkingSearchRequest;
-import com.ssafy.ws.model.dto.request.PlaceRequest;
 import com.ssafy.ws.model.dto.request.PlanSaveRequest;
 import com.ssafy.ws.model.dto.response.PlanDetailResponse;
 import com.ssafy.ws.model.service.AttServiceImpl;
 import com.ssafy.ws.util.ParkingJsonParser;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import java.io.Reader;
 import java.sql.SQLException;
@@ -48,25 +42,6 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 public class AttController {
 	private final AttServiceImpl aService;
-
-	@GetMapping("/list")
-	private String registMemberForm() {
-		return "att/att-list-form";
-	}
-
-	@PostMapping("/search")
-	public String searchAtt(@RequestParam String sido, @RequestParam String gugun, @RequestParam int contentType,
-			Model model) {
-		try {
-			List<Att> atts = aService.searchAtt(sido, gugun, contentType);
-			model.addAttribute("atts", atts);
-			return "att/att-list-form";
-		} catch (Exception e) {
-			e.printStackTrace();
-			model.addAttribute("error", e.getMessage());
-			return "att/att-list-form";
-		}
-	}
 
 	@PostMapping("/search-parking")
 	public ResponseEntity<?> searchParkingJson(@RequestBody ParkingSearchRequest request) throws IOException {
@@ -110,19 +85,27 @@ public class AttController {
 
 	@PostMapping("/attplan")
 	public ResponseEntity<List<Att>> getAttractions(@RequestBody AttPlanRequest request) throws SQLException {
-		String sido = request.getSido();
+	    String sido = request.getSido();
 	    String gugun = request.getGugun();
 	    int attId = request.getAtt_id();
 
-		List<Att> atts;
-		if (attId == 0) {
-			atts = aService.searchAttLocation(sido, gugun);
-		} else {
-			atts = aService.searchAtt(sido, gugun, attId);
-		}
+	    List<Att> atts = (attId == 0)
+	        ? aService.searchAttLocation(sido, gugun)
+	        : aService.searchAtt(sido, gugun, attId);
 
-		return ResponseEntity.ok(atts);
+	    for (Att att : atts) {
+	        try {
+	            double avg = aService.getAvgRating(att.getNo());
+	            att.setAvgRating(avg);
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    return ResponseEntity.ok(atts);
 	}
+
+
 
 	@PostMapping("/savePlan")
 	public ResponseEntity<String> savePlan(@RequestBody PlanSaveRequest request)

@@ -127,5 +127,8 @@ public class AttServiceImpl implements AttService {
 	     return dao.hasUserLikedPlan(planId, memberId);
 	 }
 	 
-
+	 @Override
+	 public double getAvgRating(int attractionNo) throws SQLException {
+		    return dao.getAvgRating(attractionNo);
+		}
 }

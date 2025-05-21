@@ -27,6 +27,8 @@ public class Att {
     private String tel; //전화번호
     private String title; //명소이름
     
+
+	private double avgRating;
     private String content_type_name; //콘텐츠타입이름
     private String sido_name; //시도이름
     private String gugun_name; //구이름

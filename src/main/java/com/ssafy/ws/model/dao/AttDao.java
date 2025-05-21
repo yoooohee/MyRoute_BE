@@ -28,4 +28,5 @@ public interface AttDao {
     Plan getPlanByIdWithLike(int planId);
     boolean hasUserLikedPlan(@Param("planId") int planId, @Param("memberId") String memberId);
     List<Att> findAllAttractions();
+    double getAvgRating(int attractionNo);
 }
