@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -226,5 +227,93 @@ public class HotPlaceController {
         hService.deleteComment(commentId, memberId);
         return ResponseEntity.ok().build();
     }
+    
+    @GetMapping("/edit/{id}")
+    public ResponseEntity<?> getEditForm(@PathVariable("id") int hotplaceId) throws SQLException {
+        Hotplace hotplace = hService.getHotplaceById(hotplaceId);
+        if (hotplace == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+        }
+
+        String mimeType = "image/jpeg";
+		byte[] imageBytes = hotplace.getImage();
+		if (imageBytes != null) {
+			try {
+				mimeType = java.net.URLConnection
+						.guessContentTypeFromStream(new java.io.ByteArrayInputStream(imageBytes));
+				if (mimeType == null) {
+					String str = new String(imageBytes);
+					if (str.trim().startsWith("<svg")) {
+						mimeType = "image/svg+xml";
+					}
+				}
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 오류");
+			}
+		}
+
+		String imageBase64 = (imageBytes != null)
+				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
+				: null;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("title", hotplace.getTitle());
+        result.put("content", hotplace.getContent());
+        result.put("rating", hotplace.getStarPoint());
+        result.put("no", hotplace.getAttractionNo());
+        result.put("attractionName", hotplace.getAttractionName());
+        result.put("imageBase64", imageBase64);
+
+        return ResponseEntity.ok(result);
+    }
+
+    
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<?> updatePost(
+            @PathVariable("id") int hotplaceId,
+            @RequestParam("no") int attractionNo,
+            @RequestParam String title,
+            @RequestParam double rating,
+            @RequestParam String content,
+            @RequestParam(required = false) MultipartFile images,
+            @RequestParam("writerId") String memberId) {
+
+        byte[] imageBytes = null;
+        if (images != null && !images.isEmpty()) {
+            try {
+                imageBytes = images.getBytes();
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패");
+            }
+        }
+        else {
+            Hotplace origin = hService.getHotplaceById(hotplaceId);
+            imageBytes = origin != null ? origin.getImage() : null;
+        }
+
+        HotplacePost updatedPost = new HotplacePost();
+        updatedPost.setId(hotplaceId);
+        updatedPost.setMemberId(memberId);
+        updatedPost.setAttractionNo(attractionNo);
+        updatedPost.setTitle(title);
+        updatedPost.setRating(rating);
+        updatedPost.setContent(content);
+        updatedPost.setImage(imageBytes);
+
+        boolean result = hService.updatePost(updatedPost);
+        if (!result) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("수정할 게시글이 없습니다.");
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete/{hotplaceId}")
+	public ResponseEntity<String> deletePost(@PathVariable int hotplaceId) throws SQLException {
+	    hService.deletePost(hotplaceId);
+
+	    return ResponseEntity.ok("삭제 완료");
+	}
+	
 
 }

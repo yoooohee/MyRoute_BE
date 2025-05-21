@@ -74,7 +74,19 @@
   DELETE FROM comment
   WHERE comment_id = #{commentId} AND member_id = #{memberId}
 </delete>
+
+<insert id="updatePost" parameterType="HotplacePost">
+		UPDATE hotplace SET member_id = #{memberId},
+		attraction_no = #{attractionNo},
+		title = #{title},
+		star_point = #{rating},
+		content = #{content},
+		image = #{image} WHERE hotplace_id = #{id}
+	</insert>
   
+<delete id="deletePost">
+  DELETE FROM hotplace WHERE hotplace_id = #{hotplaceId}
+</delete>
 
 	<resultMap type="Att" id="attMap">
 		<id column="no" property="no" />

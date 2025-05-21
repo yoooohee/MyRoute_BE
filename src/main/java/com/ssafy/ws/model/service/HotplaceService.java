@@ -29,4 +29,11 @@ public interface HotplaceService {
 	void addComment(int hotplaceId, String memberId, String content);
 	
     List<Comment> getComments(int hotplaceId);
+    
+    boolean updatePost(HotplacePost updatePost);
+
+	void deleteComment(int commentId, String memberId);
+    
+    void deletePost(int hotplaceId);
+
 }

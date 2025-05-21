@@ -34,4 +34,8 @@ public interface HotplaceDao {
     List<Comment> getCommentsByHotplaceId(int hotplaceId);
     
     void deleteComment(int commentId, String memberId);
+    
+    boolean updatePost(HotplacePost updatePost);
+    
+    void deletePost(int hotplaceId);
 }

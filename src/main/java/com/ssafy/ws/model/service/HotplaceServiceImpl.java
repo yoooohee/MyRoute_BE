@@ -74,7 +74,18 @@ public class HotplaceServiceImpl implements HotplaceService {
         return hotplaceDao.getCommentsByHotplaceId(hotplaceId);
     }
 
+    @Override
 	public void deleteComment(int commentId, String memberId) {
 		hotplaceDao.deleteComment(commentId, memberId);
 	}
+	
+    @Override
+	public boolean updatePost(HotplacePost updatePost) {
+		return hotplaceDao.updatePost(updatePost);
+	}
+    
+    @Override
+    public void deletePost(int hotplaceId) {
+    	hotplaceDao.deletePost(hotplaceId);
+    }
 }
