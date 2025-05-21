@@ -20,4 +20,5 @@ public class Place {
     private String first_image1;
     private String addr1;
     private String content_type_name;
+    private double avgRating;
 }

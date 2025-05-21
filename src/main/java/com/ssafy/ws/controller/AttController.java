@@ -210,6 +210,15 @@ public class AttController {
 	    }
 	    
 	    List<Place> places = aService.getPlacesByPlanId(planId);
+	    
+	    for (Place place : places) {
+	        try {
+	            double avg = aService.getAvgRating(place.getAttractionNo());
+	            place.setAvgRating(avg);
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
 
 	    boolean likedByUser = false;
 	    if (memberId != null) {
