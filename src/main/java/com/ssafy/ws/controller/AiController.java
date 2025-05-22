@@ -35,7 +35,7 @@ public class AiController {
     public ResponseEntity<String> recommendCourse(@RequestBody Map<String, String> request) {
         String area = request.get("area");
         String days = request.get("days");
-        String userType = request.get("userType"); // 👈 추가
+        String userType = request.get("userType");
         try {
             String result = aiService.recommendCourse(area, days, userType);
             return ResponseEntity.ok(result);
