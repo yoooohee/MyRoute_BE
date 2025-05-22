@@ -47,6 +47,9 @@ public class NoticeController {
 	@PostMapping
 	public ResponseEntity<?> insert(@RequestBody NoticeInsertRequest notice) {
 		checkAdmin();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String memberName = memberService.findById(authentication.getName()).getName();
+		notice.setMemberName(memberName);
 		service.insert(notice);
 		return ResponseEntity.ok("등록 되었습니다.");
 	}
