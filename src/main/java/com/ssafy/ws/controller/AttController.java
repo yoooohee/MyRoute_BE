@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.core.io.ClassPathResource;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.ws.model.dto.Att;
+import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.Parking;
 import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
@@ -31,6 +34,8 @@ import com.ssafy.ws.model.dto.request.ParkingSearchRequest;
 import com.ssafy.ws.model.dto.request.PlanSaveRequest;
 import com.ssafy.ws.model.dto.response.PlanDetailResponse;
 import com.ssafy.ws.model.service.AttServiceImpl;
+import com.ssafy.ws.model.service.MemberService;
+import com.ssafy.ws.util.ImageUtil;
 import com.ssafy.ws.util.ParkingJsonParser;
 
 import lombok.RequiredArgsConstructor;
@@ -42,7 +47,8 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 public class AttController {
 	private final AttServiceImpl aService;
-
+	private final MemberService memberService;
+	
 	@PostMapping("/search-parking")
 	public ResponseEntity<?> searchParkingJson(@RequestBody ParkingSearchRequest request) throws IOException {
 		try {
@@ -234,7 +240,14 @@ public class AttController {
 	        .myPost(myPost)
 	        .build();
 
-	    return ResponseEntity.ok(response);
+	    Member member = memberService.findById(memberId); 
+	    String imageBase64 = ImageUtil.convertImageBytesToBase64(member.getProfileImage());
+		
+	    Map<String, Object> result = new HashMap<>();
+		result.put("profileImage", imageBase64);
+		result.put("plan", response);
+	    
+	    return ResponseEntity.ok(result);
 	}
 	
 	@PostMapping("/planlike/{planId}")

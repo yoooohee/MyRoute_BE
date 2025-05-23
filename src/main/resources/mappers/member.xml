@@ -32,12 +32,21 @@
 		WHERE id = #{id}
 	</update>
 
+	<!-- 내 프로필 이미지 변경 -->
 	<update id="updateProfileImage">
 		UPDATE member
 		SET profile_image = #{image}
-		WHERE id = #{id}
+		WHERE id =
+		#{id}
 	</update>
-	
+
+	<!-- 내 프로필 이미지 조회 -->
+	<select id="findProfileImageById" resultType="byte[]">
+		SELECT profile_image
+		FROM member
+		WHERE id = #{id}
+	</select>
+
 	<!-- 비밀번호 변경 -->
 	<update id="updatePassword">
 		UPDATE MEMBER
@@ -56,4 +65,5 @@
 		<result property="role" column="ROLE" />
 		<result property="profileImage" column="PROFILE_IMAGE" />
 	</resultMap>
+
 </mapper>
