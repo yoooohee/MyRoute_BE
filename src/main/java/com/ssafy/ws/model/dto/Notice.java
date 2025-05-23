@@ -11,6 +11,6 @@ public class Notice {
 	private Integer noticeId;
 	private String title;
 	private String content;
-	private String memberName;
+	private String memberId;
 	private LocalDateTime createAt;
 }

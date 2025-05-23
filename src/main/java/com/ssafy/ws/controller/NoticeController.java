@@ -1,6 +1,8 @@
 package com.ssafy.ws.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +23,7 @@ import com.ssafy.ws.model.dto.request.NoticeInsertRequest;
 import com.ssafy.ws.model.dto.request.NoticeUpdateRequest;
 import com.ssafy.ws.model.service.MemberService;
 import com.ssafy.ws.model.service.NoticeService;
+import com.ssafy.ws.util.ImageUtil;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -41,16 +44,26 @@ public class NoticeController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Notice> findById(@PathVariable int id) {
-		return ResponseEntity.ok(service.findById(id));
+	public ResponseEntity<?> findById(@PathVariable int id) {
+		Notice notice = service.findById(id);
+		Member admin = memberService.findById(notice.getMemberId());
+
+		String imageBase64 = ImageUtil.convertImageBytesToBase64(admin.getProfileImage());
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("notice", notice);
+		result.put("memberName", admin.getName());
+		result.put("profileImage", imageBase64);
+
+		return ResponseEntity.ok(result);
 	}
 
 	@PostMapping
 	public ResponseEntity<?> insert(@RequestBody NoticeInsertRequest notice) {
 		checkAdmin();
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String memberName = memberService.findById(authentication.getName()).getName();
-		notice.setMemberName(memberName);
+		String memberId = authentication.getName();
+		notice.setMemberId(memberId);
 		service.insert(notice);
 		return ResponseEntity.ok("등록 되었습니다.");
 	}

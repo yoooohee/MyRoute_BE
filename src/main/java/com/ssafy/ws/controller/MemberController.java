@@ -1,9 +1,6 @@
 package com.ssafy.ws.controller;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URLConnection;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +19,7 @@ import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
 import com.ssafy.ws.model.dto.request.PasswordModifyRequest;
 import com.ssafy.ws.model.dto.response.MemberInfoResponse;
 import com.ssafy.ws.model.service.MemberService;
+import com.ssafy.ws.util.ImageUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,26 +42,7 @@ public class MemberController {
 		String memberId = authentication.getName();
 		MemberInfoResponse memberInfo = service.findMyInfoById(memberId);
 
-		byte[] imageBytes = memberInfo.getImageBytes();
-
-		String mimeType = "image/jpeg";
-		if (imageBytes != null) {
-			try {
-				mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(imageBytes));
-				if (mimeType == null) {
-					String str = new String(imageBytes);
-					if (str.trim().startsWith("<svg")) {
-						mimeType = "image/svg+xml";
-					}
-				}
-			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "이미지 처리 실패"));
-			}
-		}
-
-		String imageBase64 = (imageBytes != null)
-				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
-				: null;
+		String imageBase64 = ImageUtil.convertImageBytesToBase64(memberInfo.getImageBytes());
 
 		Map<String, Object> result = new HashMap<>();
 		result.put("memberInfo", memberInfo);

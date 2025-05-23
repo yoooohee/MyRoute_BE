@@ -10,5 +10,5 @@ import lombok.Setter;
 public class NoticeInsertRequest {
 	private String title;
 	private String content;
-	private String memberName;
+	private String memberId;
 }
