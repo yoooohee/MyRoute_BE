@@ -1,5 +1,7 @@
 package com.ssafy.ws.model.service;
 
+import java.io.IOException;
+
 import org.springframework.stereotype.Service;
 
 import com.ssafy.ws.model.dao.MemberDao;
@@ -18,10 +20,12 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 	private final MemberDao dao;
 
-	public int signIn(Member member) {
+	public void signIn(Member member) throws Exception {
 		member.encodePassword(member.getPassword());
 		member.initializeUserRole();
-		return dao.memberRegister(member);
+		member.setDefaultImage();
+		
+		dao.memberRegister(member);
 	}
 
 	public int unRegister(Member member) {
@@ -29,7 +33,7 @@ public class MemberService {
 	}
 
 	public Member login(LoginRequest input) {
-		Member dbMember = dao.login(input.getId());
+		Member dbMember = dao.findById(input.getId());
 		if (dbMember == null) {
 			return null;
 		}
@@ -48,13 +52,18 @@ public class MemberService {
 	public MemberInfoResponse findMyInfoById(String id) {
 		Member member = dao.findById(id);
 		MemberInfoResponse response = new MemberInfoResponse(member.getId(), member.getName(), member.getEmail(),
-				member.getPnumber());
+				member.getPnumber(), member.getProfileImage());
 
 		return response;
 	}
 
-	public void updateMemberInfo(String memberId, MemberUpdateRequest member) {
+	public void updateMemberInfo(String memberId, MemberUpdateRequest member) throws IOException {
 		dao.updateMemberInfo(memberId, member);
+		
+		if (member.getProfileImage() != null && !member.getProfileImage().isEmpty()) {
+			byte[] imageBytes = member.getProfileImage().getBytes();
+			dao.updateProfileImage(memberId, imageBytes);	
+		}
 	}
 
 	public void updatePassword(String memberId, PasswordModifyRequest password) {
@@ -77,5 +86,9 @@ public class MemberService {
 
 		String password = request.getPassword();
 		dao.updatePassword(id, PasswordUtil.hashPassword(password));
+	}
+	
+	public byte[] findProfileImageById(String id) {
+		return dao.findProfileImageById(id);
 	}
 }

@@ -17,13 +17,6 @@ public interface MemberDao {
 	public int memberRegister(Member member);
 
 	/**
-	 * 회원 정보 수정
-	 * 
-	 * @param member
-	 */
-	public int memberInfoUpdate(Member member);
-
-	/**
 	 * 회원 조회(마이페이지)
 	 * 
 	 * @param member
@@ -38,14 +31,6 @@ public interface MemberDao {
 	 */
 	public int unRegisterMember(Member member);
 
-	/**
-	 * 로그인
-	 * 
-	 * @param member(id, pw만 존재)
-	 * @return
-	 */
-	public Member login(String id);
-
 	public int updateMemberInfo(String id, MemberUpdateRequest member);
 
 	public Member findById(String memberId);
@@ -53,4 +38,8 @@ public interface MemberDao {
 	public void updatePassword(String id, String password);
 
 	public void changePassword(PasswordChangeRequest request);
+
+	public byte[] findProfileImageById(String id);
+
+	public void updateProfileImage(String id, byte[] image);
 }

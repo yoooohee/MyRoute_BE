@@ -5,10 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MemberInfoResponse {
-	private String id;
+public class LoginResponse {
+	private String token;
 	private String name;
-	private String email;
-	private String pnumber;
-	private byte[] imageBytes;
+	private String role;
+    private String profileImage;
 }

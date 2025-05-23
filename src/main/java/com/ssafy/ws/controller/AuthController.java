@@ -1,5 +1,9 @@
 package com.ssafy.ws.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.Base64;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,7 @@ import com.ssafy.ws.model.dto.request.EmailVerificationReqeust;
 import com.ssafy.ws.model.dto.request.LoginRequest;
 import com.ssafy.ws.model.dto.request.PasswordChangeRequest;
 import com.ssafy.ws.model.dto.response.EmailVerificationResponse;
+import com.ssafy.ws.model.dto.response.LoginResponse;
 import com.ssafy.ws.model.service.MailService;
 import com.ssafy.ws.model.service.MemberService;
 import com.ssafy.ws.util.JwtUtil;
@@ -31,7 +36,7 @@ public class AuthController {
 	private final JwtUtil jwtUtil;
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@RequestBody Member member) {
+	public ResponseEntity<?> signup(@RequestBody Member member) throws Exception {
 		service.signIn(member);
 		return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
 	}
@@ -45,8 +50,29 @@ public class AuthController {
 		}
 
 		String token = jwtUtil.generateToken(loginRequest.getId());
+
+		String mimeType = "image/jpeg";
+		if (loginMember.getProfileImage() != null) {
+			try {
+				mimeType = URLConnection
+						.guessContentTypeFromStream(new ByteArrayInputStream(loginMember.getProfileImage()));
+				if (mimeType == null) {
+					String str = new String(loginMember.getProfileImage());
+					if (str.trim().startsWith("<svg")) {
+						mimeType = "image/svg+xml";
+					}
+				}
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "이미지 처리 실패"));
+			}
+		}
+
+		String imageBase64 = (loginMember.getProfileImage() != null)
+				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(loginMember.getProfileImage())
+				: null;
+
 		return ResponseEntity.ok()
-				.body(Map.of("token", token, "name", loginMember.getName(), "role", loginMember.getRole()));
+				.body(new LoginResponse(token, loginMember.getName(), loginMember.getRole(), imageBase64));
 	}
 
 	@PostMapping("/send-code")

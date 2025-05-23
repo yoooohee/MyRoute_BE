@@ -1,11 +1,19 @@
 package com.ssafy.ws.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +33,7 @@ public class MemberController {
 	private final MemberService service;
 
 	@GetMapping("/me")
-	private ResponseEntity<?> findMyInfoById() {
+	public ResponseEntity<?> findMyInfoById() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()
@@ -36,11 +44,36 @@ public class MemberController {
 		String memberId = authentication.getName();
 		MemberInfoResponse memberInfo = service.findMyInfoById(memberId);
 
-		return ResponseEntity.ok(memberInfo);
+		byte[] imageBytes = memberInfo.getImageBytes();
+
+		String mimeType = "image/jpeg";
+		if (imageBytes != null) {
+			try {
+				mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(imageBytes));
+				if (mimeType == null) {
+					String str = new String(imageBytes);
+					if (str.trim().startsWith("<svg")) {
+						mimeType = "image/svg+xml";
+					}
+				}
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "이미지 처리 실패"));
+			}
+		}
+
+		String imageBase64 = (imageBytes != null)
+				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
+				: null;
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("memberInfo", memberInfo);
+		result.put("profileImage", imageBase64);
+
+		return ResponseEntity.ok(result);
 	}
 
 	@PutMapping("/me")
-	private ResponseEntity<?> updateMyInfo(@RequestBody MemberUpdateRequest member) {
+	public ResponseEntity<?> updateMyInfo(@ModelAttribute MemberUpdateRequest member) throws IOException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -54,7 +87,7 @@ public class MemberController {
 	}
 
 	@PutMapping("/me/password")
-	private ResponseEntity<?> updatePassword(@RequestBody PasswordModifyRequest password) {
+	public ResponseEntity<?> updatePassword(@RequestBody PasswordModifyRequest password) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()) {

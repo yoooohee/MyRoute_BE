@@ -23,6 +23,7 @@ import com.ssafy.ws.model.service.MemberService;
 import com.ssafy.ws.model.service.NoticeService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import lombok.RequiredArgsConstructor;
 
@@ -72,7 +73,7 @@ public class NoticeController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new ResponseStatusException(FORBIDDEN, "로그인이 필요합니다.");
+			throw new ResponseStatusException(UNAUTHORIZED, "로그인이 필요합니다.");
 		}
 
 		String memberId = authentication.getName();
