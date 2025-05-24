@@ -131,4 +131,24 @@ public class AttServiceImpl implements AttService {
 	 public double getAvgRating(int attractionNo) throws SQLException {
 		    return dao.getAvgRating(attractionNo);
 		}
+	 
+	 @Override
+    public void addFavorite(String memberId, int attractionNo) {
+		 dao.insertFavorite(memberId, attractionNo);
+    }
+
+    @Override
+    public void removeFavorite(String memberId, int attractionNo) {
+    	dao.deleteFavorite(memberId, attractionNo);
+    }
+
+    @Override
+    public boolean isFavorite(String memberId, int attractionNo) {
+        return dao.isFavorite(memberId, attractionNo);
+    }
+    
+    @Override
+    public List<Integer> getAllFavoriteAttractionNos(String memberId) {
+    	return dao.getAllFavoriteAttractionNos(memberId);
+    }
 }

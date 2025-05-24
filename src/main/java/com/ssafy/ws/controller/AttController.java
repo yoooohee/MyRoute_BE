@@ -281,4 +281,54 @@ public class AttController {
 	    aService.Planlikecancel(planId, memberId);
 	    return ResponseEntity.ok("좋아요 취소 완료");
 	}
+	
+	@PostMapping("/favorite/add")
+    public ResponseEntity<?> add(@RequestBody Map<String, Object> body) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName();
+        int attractionNo = (int) body.get("attractionNo");
+        aService.addFavorite(memberId, attractionNo);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/favorite/remove")
+    public ResponseEntity<?> remove(@RequestBody Map<String, Object> body) {
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName();
+        int attractionNo = (int) body.get("attractionNo");
+        aService.removeFavorite(memberId, attractionNo);
+        return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/favorite/all")
+    public ResponseEntity<List<Map<String, Object>>> getAllFavorites() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String memberId = authentication.getName();
+        List<Integer> favoriteAttractionNos = aService.getAllFavoriteAttractionNos(memberId);
+
+        List<Map<String, Object>> response = favoriteAttractionNos.stream()
+            .map(no -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("attractionNo", no);
+                return map;
+            }).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
 }

@@ -104,6 +104,26 @@ from plan a join sidos b on (a.area_code = b.sido_code) where a.is_public = 1
     WHERE attraction_no = #{attractionNo}
 </select>
 
+  <insert id="insertFavorite">
+    INSERT INTO favorite_place (member_id, attraction_no)
+    VALUES (#{memberId}, #{attractionNo})
+  </insert>
+
+  <delete id="deleteFavorite">
+    DELETE FROM favorite_place
+    WHERE member_id = #{memberId} AND attraction_no = #{attractionNo}
+  </delete>
+
+  <select id="isFavorite" resultType="boolean">
+    SELECT COUNT(*) > 0 FROM favorite_place
+    WHERE member_id = #{memberId} AND attraction_no = #{attractionNo}
+  </select>
+  
+  <select id="getAllFavoriteAttractionNos" resultType="int">
+  SELECT attraction_no FROM favorite_place WHERE member_id = #{memberId}
+</select>
+
+  
 	<resultMap type="Att" id="attMap">
 	<id column="no" property="no"/>
 	<result column="title" property="title"/>

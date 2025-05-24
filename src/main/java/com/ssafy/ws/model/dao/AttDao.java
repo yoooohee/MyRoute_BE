@@ -29,4 +29,9 @@ public interface AttDao {
     boolean hasUserLikedPlan(@Param("planId") int planId, @Param("memberId") String memberId);
     List<Att> findAllAttractions();
     double getAvgRating(int attractionNo);
+    void insertFavorite(String memberId, int attractionNo);
+    void deleteFavorite(String memberId, int attractionNo);
+    boolean isFavorite(String memberId, int attractionNo);
+    List<Integer> getAllFavoriteAttractionNos(String memberId);
+
 }

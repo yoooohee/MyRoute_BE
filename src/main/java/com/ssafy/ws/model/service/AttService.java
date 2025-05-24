@@ -25,5 +25,9 @@ public interface AttService {
 	Plan getPlanByIdWithLike(int planId) throws SQLException;
 	public boolean hasUserLikedPlan(int planId, String memberId);
 	double getAvgRating(int attractionNo) throws SQLException;
-	
+	void addFavorite(String memberId, int attractionNo);
+    void removeFavorite(String memberId, int attractionNo);
+    boolean isFavorite(String memberId, int attractionNo);
+    List<Integer> getAllFavoriteAttractionNos(String memberId);
+
 }
