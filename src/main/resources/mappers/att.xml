@@ -123,6 +123,11 @@ from plan a join sidos b on (a.area_code = b.sido_code) where a.is_public = 1
   SELECT attraction_no FROM favorite_place WHERE member_id = #{memberId}
 </select>
 
+<insert id="insertNotification">
+  INSERT INTO notification (member_id, type, content, url, is_read, created_at)
+  VALUES (#{memberId}, #{type}, #{content}, #{url}, #{isRead}, #{createdAt})
+</insert>
+
   
 	<resultMap type="Att" id="attMap">
 	<id column="no" property="no"/>

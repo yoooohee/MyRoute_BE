@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.ws.model.dto.Att;
+import com.ssafy.ws.model.dto.Notification;
 import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
 
@@ -33,5 +34,6 @@ public interface AttDao {
     void deleteFavorite(String memberId, int attractionNo);
     boolean isFavorite(String memberId, int attractionNo);
     List<Integer> getAllFavoriteAttractionNos(String memberId);
+    void insertNotification(Notification notification);
 
 }

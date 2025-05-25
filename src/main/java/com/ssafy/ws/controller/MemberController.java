@@ -2,6 +2,7 @@ package com.ssafy.ws.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -11,10 +12,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.ssafy.ws.model.dto.Notification;
 import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
 import com.ssafy.ws.model.dto.request.PasswordModifyRequest;
 import com.ssafy.ws.model.dto.response.MemberInfoResponse;
@@ -78,4 +82,20 @@ public class MemberController {
 
 		return ResponseEntity.ok("비밀번호가 변경되었습니다.");
 	}
+	
+	@GetMapping("/notification")
+	public ResponseEntity<List<Notification>> getUserNotifications() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String memberId = authentication.getName();
+	    List<Notification> notifications = service.getNotifications(memberId);
+	    return ResponseEntity.ok(notifications);
+	}
+
+	@PostMapping("/notification/read/{id}")
+	public ResponseEntity<?> markAsRead(@PathVariable Long id) {
+	    service.markAsRead(id);
+	    return ResponseEntity.ok().build();
+	}
+
+
 }

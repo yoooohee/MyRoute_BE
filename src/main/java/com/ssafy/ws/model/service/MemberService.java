@@ -1,11 +1,13 @@
 package com.ssafy.ws.model.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.ssafy.ws.model.dao.MemberDao;
 import com.ssafy.ws.model.dto.Member;
+import com.ssafy.ws.model.dto.Notification;
 import com.ssafy.ws.model.dto.request.LoginRequest;
 import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
 import com.ssafy.ws.model.dto.request.PasswordChangeRequest;
@@ -91,4 +93,12 @@ public class MemberService {
 	public byte[] findProfileImageById(String id) {
 		return dao.findProfileImageById(id);
 	}
+	
+    public List<Notification> getNotifications(String memberId) {
+        return dao.getNotifications(memberId);
+    }
+
+    public void markAsRead(Long notificationId) {
+        dao.markAsRead(notificationId);
+    }
 }

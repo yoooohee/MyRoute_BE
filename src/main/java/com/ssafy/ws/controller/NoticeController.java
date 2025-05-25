@@ -97,4 +97,5 @@ public class NoticeController {
 			throw new ResponseStatusException(FORBIDDEN, "관리자 권한이 필요합니다.");
 		}
 	}
+	
 }
