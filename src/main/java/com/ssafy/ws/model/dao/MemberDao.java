@@ -45,6 +45,8 @@ public interface MemberDao {
 	public byte[] findProfileImageById(String id);
 
 	public void updateProfileImage(String id, byte[] image);
+
+	public int deleteMember(String id);
 	
 	List<Notification> getNotifications(String memberId);
 	

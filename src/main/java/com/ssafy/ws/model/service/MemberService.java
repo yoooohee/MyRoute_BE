@@ -94,6 +94,10 @@ public class MemberService {
 		return dao.findProfileImageById(id);
 	}
 	
+	public int deleteMember(String id) {
+		return dao.deleteMember(id);
+	}
+	
     public List<Notification> getNotifications(String memberId) {
         return dao.getNotifications(memberId);
     }
