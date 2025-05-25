@@ -28,6 +28,7 @@ import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.CommentRequest;
+import com.ssafy.ws.model.dto.response.CommentResponse;
 import com.ssafy.ws.model.dto.response.HotplaceDetailResponse;
 import com.ssafy.ws.model.dto.response.HotplaceListResponse;
 import com.ssafy.ws.model.dto.response.HotplacePost;
@@ -114,35 +115,19 @@ public class HotPlaceController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물이 존재하지 않습니다.");
 		}
 
-		String mimeType = "image/jpeg";
-		byte[] imageBytes = hotplace.getImage();
-		if (imageBytes != null) {
-			try {
-				mimeType = java.net.URLConnection
-						.guessContentTypeFromStream(new java.io.ByteArrayInputStream(imageBytes));
-				if (mimeType == null) {
-					String str = new String(imageBytes);
-					if (str.trim().startsWith("<svg")) {
-						mimeType = "image/svg+xml";
-					}
-				}
-			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 오류");
-			}
-		}
+		Member writer = memberService.findById(hotplace.getMemberId());
+		String profileImage = ImageUtil.convertImageBytesToBase64(writer.getProfileImage());
 
-		String imageBase64 = (imageBytes != null)
-				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
-				: null;
+		String imageBase64 = ImageUtil.convertImageBytesToBase64(hotplace.getImage());
 
 		boolean myPost = memberId != null && memberId.equals(hotplace.getMemberId());
 
-		HotplaceDetailResponse response = HotplaceDetailResponse.builder().hotplace(hotplace).likedByUser(likedByUser)
-				.imageBase64(imageBase64).myPost(myPost).build();
-
-		if (response.getHotplace() != null) {
-			response.getHotplace().setImage(null);
-		}
+		HotplaceDetailResponse response = HotplaceDetailResponse.builder()
+				.hotplaceId(String.valueOf(hotplace.getHotplaceId())).memberName(writer.getName()) // 작성자 이름
+				.attractionName(hotplace.getAttractionName()).title(hotplace.getTitle()).content(hotplace.getContent())
+				.createdAt(hotplace.getCreatedAt()).updatedAt(hotplace.getUpdatedAt())
+				.starPoint(hotplace.getStarPoint()).likeCount(hotplace.getLikeCount()).imageBase64(imageBase64)
+				.likedByUser(likedByUser).myPost(myPost).profileImage(profileImage).build();
 
 		return ResponseEntity.ok(response);
 	}
@@ -221,14 +206,12 @@ public class HotPlaceController {
 
 		List<Comment> comments = hService.getComments(hotplaceId);
 
-		List<Map<String, Object>> result = comments.stream().map(c -> {
-			Map<String, Object> map = new HashMap<>();
-			map.put("commentId", c.getCommentId());
-			map.put("memberId", c.getMemberId());
-			map.put("content", c.getContent());
-			map.put("createdAt", c.getCreatedAt());
-			map.put("editable", memberId != null && memberId.equals(c.getMemberId()));
-			return map;
+		List<CommentResponse> result = comments.stream().map(comment -> {
+			Member member = memberService.findById(comment.getMemberId());
+			String profileImage = ImageUtil.convertImageBytesToBase64(member.getProfileImage());
+
+			return new CommentResponse(comment.getCommentId(), member.getName(), comment.getContent(),
+					comment.getCreatedAt(), memberId != null && memberId.equals(comment.getMemberId()), profileImage);
 		}).collect(Collectors.toList());
 
 		return ResponseEntity.ok(result);

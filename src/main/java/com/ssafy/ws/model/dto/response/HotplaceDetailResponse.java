@@ -6,27 +6,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-
-import com.ssafy.ws.model.dto.Hotplace;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class HotplaceDetailResponse {
-    Hotplace hotplace;
-    private String imageBase64;
+	private String hotplaceId;
+	private String memberName;
+	private String attractionName;
+	private String title;
+	private String content;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
+	private double starPoint;
+	private int likeCount;
+	private String imageBase64;
 	private boolean likedByUser;
-    private boolean myPost;
-	
-	public String getImageBase64() {
-        return imageBase64 != null ? imageBase64 :
-               (hotplace.getImage() != null ? "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(hotplace.getImage()) : null);
-    }
-
-    public void setImageBase64(String imageBase64) {
-        this.imageBase64 = imageBase64;
-    }
+	private boolean myPost;
+	private String profileImage;
 }
