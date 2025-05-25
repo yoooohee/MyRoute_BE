@@ -51,4 +51,6 @@ public interface MemberDao {
 	List<Notification> getNotifications(String memberId);
 	
     void markAsRead(Long notificationId);
+    
+    void deleteNotification(Long id);
 }

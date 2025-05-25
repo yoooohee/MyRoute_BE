@@ -118,5 +118,9 @@ public class MemberController {
 	    return ResponseEntity.ok().build();
 	}
 
-
+	@DeleteMapping("/notification/delete/{id}")
+	public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
+	    service.deleteNotification(id);
+	    return ResponseEntity.ok().build();
+	}
 }

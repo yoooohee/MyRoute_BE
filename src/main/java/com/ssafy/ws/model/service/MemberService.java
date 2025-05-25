@@ -105,4 +105,8 @@ public class MemberService {
     public void markAsRead(Long notificationId) {
         dao.markAsRead(notificationId);
     }
+    
+    public void deleteNotification(Long id) {
+    	dao.deleteNotification(id);
+    }
 }
