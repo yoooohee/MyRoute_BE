@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,6 +65,26 @@ public class MemberController {
 
 		return ResponseEntity.ok("수정 완료");
 	}
+	
+	@DeleteMapping("/me")
+	public ResponseEntity<?> deleteMember() {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+	    if (authentication == null || !authentication.isAuthenticated()) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	    }
+
+	    String memberId = authentication.getName(); // JWT에서 추출한 ID
+
+	    int result = service.deleteMember(memberId);
+
+	    if (result > 0) {
+	        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴에 실패했습니다.");
+	    }
+	}
+
 
 	@PutMapping("/me/password")
 	public ResponseEntity<?> updatePassword(@RequestBody PasswordModifyRequest password) {

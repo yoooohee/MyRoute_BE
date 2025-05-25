@@ -42,7 +42,8 @@
 
 	<!-- 내 프로필 이미지 조회 -->
 	<select id="findProfileImageById" resultType="byte[]">
-		SELECT profile_image
+		SELECT
+		profile_image
 		FROM member
 		WHERE id = #{id}
 	</select>
@@ -54,6 +55,12 @@
 		WHERE ID =
 		#{id}
 	</update>
+
+	<delete id="deleteMember">
+		DELETE FROM member
+		WHERE id = #{id}
+	</delete>
+
 
 	<resultMap id="memberResultMap"
 		type="com.ssafy.ws.model.dto.Member">

@@ -91,4 +91,8 @@ public class MemberService {
 	public byte[] findProfileImageById(String id) {
 		return dao.findProfileImageById(id);
 	}
+	
+	public int deleteMember(String id) {
+		return dao.deleteMember(id);
+	}
 }
