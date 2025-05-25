@@ -1,8 +1,11 @@
 package com.ssafy.ws.model.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.ws.model.dto.Member;
+import com.ssafy.ws.model.dto.Notification;
 import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
 import com.ssafy.ws.model.dto.request.PasswordChangeRequest;
 import com.ssafy.ws.model.dto.response.MemberInfoResponse;
@@ -42,6 +45,12 @@ public interface MemberDao {
 	public byte[] findProfileImageById(String id);
 
 	public void updateProfileImage(String id, byte[] image);
-	
+
 	public int deleteMember(String id);
+	
+	List<Notification> getNotifications(String memberId);
+	
+    void markAsRead(Long notificationId);
+    
+    void deleteNotification(Long id);
 }

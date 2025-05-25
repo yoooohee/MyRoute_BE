@@ -60,6 +60,11 @@
 		DELETE FROM member
 		WHERE id = #{id}
 	</delete>
+	
+	<delete id="deleteNotification">
+		DELETE FROM notification
+		WHERE notification_id = #{id}
+	</delete>
 
 
 	<resultMap id="memberResultMap"
@@ -73,4 +78,24 @@
 		<result property="profileImage" column="PROFILE_IMAGE" />
 	</resultMap>
 
+	<resultMap id="NotificationResultMap" type="com.ssafy.ws.model.dto.Notification">
+    <id property="notificationId" column="notification_id"/>
+    <result property="memberId" column="member_id"/>
+    <result property="content" column="content"/>
+    <result property="url" column="url"/>
+    <result property="isRead" column="is_read"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <select id="getNotifications" resultMap="NotificationResultMap">
+    SELECT * FROM notification
+    WHERE member_id = #{memberId}
+    ORDER BY created_at DESC
+  </select>
+
+  <update id="markAsRead">
+    UPDATE notification
+    SET is_read = 1
+    WHERE notification_id = #{notificationId}
+  </update>
 </mapper>

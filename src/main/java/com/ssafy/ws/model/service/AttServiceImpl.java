@@ -1,6 +1,7 @@
 package com.ssafy.ws.model.service;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.ws.model.dao.AttDao;
 import com.ssafy.ws.model.dto.Att;
+import com.ssafy.ws.model.dto.Notification;
 import com.ssafy.ws.model.dto.Place;
 import com.ssafy.ws.model.dto.Plan;
 import com.ssafy.ws.model.dto.request.PlanSaveRequest;
@@ -109,8 +111,28 @@ public class AttServiceImpl implements AttService {
 	 
 	 @Override
 	 public void Planlike(int planId, String memberId) throws SQLException {
-		 dao.Planlike(planId, memberId);
+	     dao.Planlike(planId, memberId);
+
+	     Plan plan = dao.getPlanById(planId);
+	     if (plan == null) {
+	         throw new IllegalArgumentException("해당 계획이 존재하지 않습니다.");
+	     }
+
+	     // 본인 추천이 아닐 경우
+	     if (!plan.getMemberId().equals(memberId)) {
+	         Notification notification = Notification.builder()
+	             .memberId(plan.getMemberId()) // 수신자 = 계획 작성자
+	             .type("LIKE")
+	             .content(memberId + "님이 \"" + plan.getPlanName() + "\" 계획을 추천했습니다.")
+	             .url("/plan-detail/" + planId)
+	             .isRead(false)
+	             .createdAt(LocalDateTime.now())
+	             .build();
+
+	         dao.insertNotification(notification);
+	     }
 	 }
+
 	 
 	 @Override
 	 public void Planlikecancel(int planId, String memberId) throws SQLException {
