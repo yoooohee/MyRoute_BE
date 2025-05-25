@@ -1,6 +1,7 @@
 package com.ssafy.ws.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +26,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
+import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.CommentRequest;
 import com.ssafy.ws.model.dto.response.HotplaceDetailResponse;
+import com.ssafy.ws.model.dto.response.HotplaceListResponse;
 import com.ssafy.ws.model.dto.response.HotplacePost;
 import com.ssafy.ws.model.service.HotplaceServiceImpl;
+import com.ssafy.ws.model.service.MemberService;
+import com.ssafy.ws.util.ImageUtil;
 
 import lombok.RequiredArgsConstructor;
 import java.sql.SQLException;
@@ -38,6 +43,7 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 public class HotPlaceController {
 	private final HotplaceServiceImpl hService;
+	private final MemberService memberService;
 
 	@GetMapping("/allAttractions")
 	public ResponseEntity<List<Att>> getAllAttractions() throws SQLException {
@@ -48,7 +54,11 @@ public class HotPlaceController {
 	@PostMapping("/upload")
 	public ResponseEntity<?> createPost(@RequestParam("no") int attractionNo, @RequestParam String title,
 			@RequestParam double rating, @RequestParam String content,
-			@RequestParam(required = false) MultipartFile images, @RequestParam("writerId") String memberId) {
+			@RequestParam(required = false) MultipartFile images) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String memberId = (authentication != null && authentication.isAuthenticated()
+				&& !"anonymousUser".equals(authentication.getPrincipal())) ? authentication.getName() : null;
+
 		byte[] imageBytes = null;
 		if (images != null && !images.isEmpty()) {
 			try {
@@ -71,9 +81,21 @@ public class HotPlaceController {
 	}
 
 	@GetMapping("/posts")
-	public ResponseEntity<List<Hotplace>> getAllHotplacePosts() {
+	public ResponseEntity<List<HotplaceListResponse>> getAllHotplacePosts() {
 		List<Hotplace> posts = hService.getAllPosts();
-		return ResponseEntity.ok(posts);
+		List<HotplaceListResponse> response = new ArrayList<>();
+
+		for (Hotplace hotplace : posts) {
+			Member member = memberService.findById(hotplace.getMemberId());
+			String imageBase64 = ImageUtil.convertImageBytesToBase64(member.getProfileImage());
+
+			HotplaceListResponse dto = new HotplaceListResponse(hotplace.getHotplaceId(), member.getName(),
+					hotplace.getAttractionName(), hotplace.getTitle(), hotplace.getStarPoint(), hotplace.getImage(),
+					hotplace.getLikeCount(), imageBase64);
+			response.add(dto);
+		}
+
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/detail/{hotplaceId}")
@@ -112,7 +134,7 @@ public class HotPlaceController {
 		String imageBase64 = (imageBytes != null)
 				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
 				: null;
-		
+
 		boolean myPost = memberId != null && memberId.equals(hotplace.getMemberId());
 
 		HotplaceDetailResponse response = HotplaceDetailResponse.builder().hotplace(hotplace).likedByUser(likedByUser)
@@ -173,11 +195,9 @@ public class HotPlaceController {
 
 		return ResponseEntity.ok(hService.findAllByMemberId(memberId));
 	}
-	
-	
+
 	@PostMapping("/posts/{hotplaceId}/comments")
-    public ResponseEntity<?> createComment(@PathVariable int hotplaceId,
-                                           @RequestBody CommentRequest request) {
+	public ResponseEntity<?> createComment(@PathVariable int hotplaceId, @RequestBody CommentRequest request) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()
@@ -186,37 +206,37 @@ public class HotPlaceController {
 		}
 
 		String memberId = authentication.getName();
-		
-        if (memberId == null) return ResponseEntity.status(401).body("Unauthorized");
 
-        hService.addComment(hotplaceId, memberId, request.getContent());
-        return ResponseEntity.ok().build();
-    }
+		if (memberId == null)
+			return ResponseEntity.status(401).body("Unauthorized");
+
+		hService.addComment(hotplaceId, memberId, request.getContent());
+		return ResponseEntity.ok().build();
+	}
 
 	@GetMapping("/posts/{hotplaceId}/comments")
 	public ResponseEntity<?> getComments(@PathVariable int hotplaceId) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String memberId = authentication.getName();
 
-	    List<Comment> comments = hService.getComments(hotplaceId);
-	    
-	    List<Map<String, Object>> result = comments.stream().map(c -> {
-	        Map<String, Object> map = new HashMap<>();
-	        map.put("commentId", c.getCommentId());
-	        map.put("memberId", c.getMemberId());
-	        map.put("content", c.getContent());
-	        map.put("createdAt", c.getCreatedAt());
-	        map.put("editable", memberId != null && memberId.equals(c.getMemberId()));
-	        return map;
-	    }).collect(Collectors.toList());
+		List<Comment> comments = hService.getComments(hotplaceId);
 
-	    return ResponseEntity.ok(result);
+		List<Map<String, Object>> result = comments.stream().map(c -> {
+			Map<String, Object> map = new HashMap<>();
+			map.put("commentId", c.getCommentId());
+			map.put("memberId", c.getMemberId());
+			map.put("content", c.getContent());
+			map.put("createdAt", c.getCreatedAt());
+			map.put("editable", memberId != null && memberId.equals(c.getMemberId()));
+			return map;
+		}).collect(Collectors.toList());
+
+		return ResponseEntity.ok(result);
 	}
 
-	
-    @DeleteMapping("/commentdelete/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable int commentId) {
-    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	@DeleteMapping("/commentdelete/{commentId}")
+	public ResponseEntity<?> deleteComment(@PathVariable int commentId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()
 				|| authentication.getPrincipal().equals("anonymousUser")) {
@@ -224,18 +244,18 @@ public class HotPlaceController {
 		}
 
 		String memberId = authentication.getName();
-        hService.deleteComment(commentId, memberId);
-        return ResponseEntity.ok().build();
-    }
-    
-    @GetMapping("/edit/{id}")
-    public ResponseEntity<?> getEditForm(@PathVariable("id") int hotplaceId) throws SQLException {
-        Hotplace hotplace = hService.getHotplaceById(hotplaceId);
-        if (hotplace == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
-        }
+		hService.deleteComment(commentId, memberId);
+		return ResponseEntity.ok().build();
+	}
 
-        String mimeType = "image/jpeg";
+	@GetMapping("/edit/{id}")
+	public ResponseEntity<?> getEditForm(@PathVariable("id") int hotplaceId) throws SQLException {
+		Hotplace hotplace = hService.getHotplaceById(hotplaceId);
+		if (hotplace == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
+		}
+
+		String mimeType = "image/jpeg";
 		byte[] imageBytes = hotplace.getImage();
 		if (imageBytes != null) {
 			try {
@@ -256,64 +276,56 @@ public class HotPlaceController {
 				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
 				: null;
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("title", hotplace.getTitle());
-        result.put("content", hotplace.getContent());
-        result.put("rating", hotplace.getStarPoint());
-        result.put("no", hotplace.getAttractionNo());
-        result.put("attractionName", hotplace.getAttractionName());
-        result.put("imageBase64", imageBase64);
+		Map<String, Object> result = new HashMap<>();
+		result.put("title", hotplace.getTitle());
+		result.put("content", hotplace.getContent());
+		result.put("rating", hotplace.getStarPoint());
+		result.put("no", hotplace.getAttractionNo());
+		result.put("attractionName", hotplace.getAttractionName());
+		result.put("imageBase64", imageBase64);
 
-        return ResponseEntity.ok(result);
-    }
-
-    
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<?> updatePost(
-            @PathVariable("id") int hotplaceId,
-            @RequestParam("no") int attractionNo,
-            @RequestParam String title,
-            @RequestParam double rating,
-            @RequestParam String content,
-            @RequestParam(required = false) MultipartFile images,
-            @RequestParam("writerId") String memberId) {
-
-        byte[] imageBytes = null;
-        if (images != null && !images.isEmpty()) {
-            try {
-                imageBytes = images.getBytes();
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패");
-            }
-        }
-        else {
-            Hotplace origin = hService.getHotplaceById(hotplaceId);
-            imageBytes = origin != null ? origin.getImage() : null;
-        }
-
-        HotplacePost updatedPost = new HotplacePost();
-        updatedPost.setId(hotplaceId);
-        updatedPost.setMemberId(memberId);
-        updatedPost.setAttractionNo(attractionNo);
-        updatedPost.setTitle(title);
-        updatedPost.setRating(rating);
-        updatedPost.setContent(content);
-        updatedPost.setImage(imageBytes);
-
-        boolean result = hService.updatePost(updatedPost);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("수정할 게시글이 없습니다.");
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/delete/{hotplaceId}")
-	public ResponseEntity<String> deletePost(@PathVariable int hotplaceId) throws SQLException {
-	    hService.deletePost(hotplaceId);
-
-	    return ResponseEntity.ok("삭제 완료");
+		return ResponseEntity.ok(result);
 	}
-	
+
+	@PutMapping("/edit/{id}")
+	public ResponseEntity<?> updatePost(@PathVariable("id") int hotplaceId, @RequestParam("no") int attractionNo,
+			@RequestParam String title, @RequestParam double rating, @RequestParam String content,
+			@RequestParam(required = false) MultipartFile images, @RequestParam("writerId") String memberId) {
+
+		byte[] imageBytes = null;
+		if (images != null && !images.isEmpty()) {
+			try {
+				imageBytes = images.getBytes();
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 실패");
+			}
+		} else {
+			Hotplace origin = hService.getHotplaceById(hotplaceId);
+			imageBytes = origin != null ? origin.getImage() : null;
+		}
+
+		HotplacePost updatedPost = new HotplacePost();
+		updatedPost.setId(hotplaceId);
+		updatedPost.setMemberId(memberId);
+		updatedPost.setAttractionNo(attractionNo);
+		updatedPost.setTitle(title);
+		updatedPost.setRating(rating);
+		updatedPost.setContent(content);
+		updatedPost.setImage(imageBytes);
+
+		boolean result = hService.updatePost(updatedPost);
+		if (!result) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("수정할 게시글이 없습니다.");
+		}
+
+		return ResponseEntity.ok().build();
+	}
+
+	@DeleteMapping("/delete/{hotplaceId}")
+	public ResponseEntity<String> deletePost(@PathVariable int hotplaceId) throws SQLException {
+		hService.deletePost(hotplaceId);
+
+		return ResponseEntity.ok("삭제 완료");
+	}
 
 }

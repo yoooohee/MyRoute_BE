@@ -1,11 +1,5 @@
 package com.ssafy.ws.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.URLConnection;
-import java.util.Base64;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +15,7 @@ import com.ssafy.ws.model.dto.response.EmailVerificationResponse;
 import com.ssafy.ws.model.dto.response.LoginResponse;
 import com.ssafy.ws.model.service.MailService;
 import com.ssafy.ws.model.service.MemberService;
+import com.ssafy.ws.util.ImageUtil;
 import com.ssafy.ws.util.JwtUtil;
 
 import jakarta.servlet.http.HttpSession;
@@ -43,6 +38,7 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+		System.out.println("로그인");
 		Member loginMember = service.login(loginRequest);
 
 		if (loginMember == null) {
@@ -50,26 +46,7 @@ public class AuthController {
 		}
 
 		String token = jwtUtil.generateToken(loginRequest.getId());
-
-		String mimeType = "image/jpeg";
-		if (loginMember.getProfileImage() != null) {
-			try {
-				mimeType = URLConnection
-						.guessContentTypeFromStream(new ByteArrayInputStream(loginMember.getProfileImage()));
-				if (mimeType == null) {
-					String str = new String(loginMember.getProfileImage());
-					if (str.trim().startsWith("<svg")) {
-						mimeType = "image/svg+xml";
-					}
-				}
-			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "이미지 처리 실패"));
-			}
-		}
-
-		String imageBase64 = (loginMember.getProfileImage() != null)
-				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(loginMember.getProfileImage())
-				: null;
+		String imageBase64 = ImageUtil.convertImageBytesToBase64(loginMember.getProfileImage());
 
 		return ResponseEntity.ok()
 				.body(new LoginResponse(token, loginMember.getName(), loginMember.getRole(), imageBase64));
