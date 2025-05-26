@@ -350,6 +350,15 @@ public class AttController {
 		List<Att> favoriteAttractions = favoriteAttractionNos.stream().map(aService::findAttById)
 				.collect(Collectors.toList());
 
+		for (Att att : favoriteAttractions) {
+			try {
+				double avg = aService.getAvgRating(att.getNo());
+				att.setAvgRating(avg);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return ResponseEntity.ok(favoriteAttractions);
 	}
 }
