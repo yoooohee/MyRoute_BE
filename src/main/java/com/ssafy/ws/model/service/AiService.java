@@ -16,7 +16,7 @@ public class AiService {
         OkHttpClient client = new OkHttpClient();
 
         JSONObject requestBody = new JSONObject()
-            .put("model", "gpt-3.5-turbo")
+            .put("model", "gpt-4o")
             .put("messages", new org.json.JSONArray()
                 .put(new JSONObject()
                     .put("role", "system")
@@ -51,17 +51,33 @@ public class AiService {
     public String recommendCourse(String area, String days, String userType) throws IOException {
         OkHttpClient client = new OkHttpClient();
 
+        // 사용자 유형별 맞춤 인삿말
+        String userPromptPrefix = switch (userType.toLowerCase()) {
+            case "연인" -> "💑 연인과 함께하는 여행이라면 이런 일정이 어울려요!\n";
+            case "가족" -> "👨‍👩‍👧‍👦 가족들과의 여행이라면 이렇게 추천드릴게요!\n";
+            case "친구" -> "🧑‍🤝‍🧑 친구들과 함께라면 즐거운 추억을 만들 수 있어요!\n";
+            case "혼자" -> "🧍 혼자 떠나는 여행이라면 이런 코스는 어때요?\n";
+            default -> "✨ 여행자님께 딱 맞는 일정을 추천드릴게요!\n";
+        };
+
         String prompt = String.format(
-			"%s 지역을 %s일 동안 %s 여행자가 여행한다고 가정하고, 아침부터 저녁까지 이모지와 함께 장소 및 간단한 설명을 포함한 여행 일정을 추천해줘. 각 일정은 간결하고 보기 좋게 정리해줘. ✨ 답변 마지막에 '📌 참고: 여행 계획 게시판을 참고해보세요!' 를 붙여줘.",
-		    area, days, userType
+            "%s%s 지역을 %s일 동안 여행한다고 가정하고, 아침부터 저녁까지 이모지와 함께 장소 및 간단한 설명을 포함한 여행 일정을 추천해줘. 각 일정은 간결하고 보기 좋게 정리해줘. ✨ 답변 마지막에 '📌 참고: 여행 계획 게시판을 참고해보세요!' 를 붙여줘.",
+            userPromptPrefix, area, days
         );
 
         JSONObject requestBody = new JSONObject()
-            .put("model", "gpt-3.5-turbo")
+            .put("model", "gpt-4o") // 또는 gpt-4o-mini
             .put("messages", new org.json.JSONArray()
                 .put(new JSONObject()
                     .put("role", "system")
-                    .put("content", "너는 마이루트의 AI 여행 도우미야. 지역, 일정, 명소, 추천 경로 등 여행과 관련된 질문에만 응답해야 해. 한번 찾아보고 여행과 관련이 아예 0%인 주제는 무조건 다음 문장으로만 응답해: '저는 마이루트의 여행 도우미입니다! 여행과 관련된 질문만 부탁드려요 :)'")
+                    .put("content", """
+                        너는 마이루트의 AI 여행 도우미야.
+                        지역, 일정, 명소, 추천 경로 등 여행과 관련된 질문에만 응답해야 해.
+                        여행과 관련이 전혀 없다고 판단되면 반드시 다음 문장으로만 응답해:
+                        '저는 마이루트의 여행 도우미입니다! 여행과 관련된 질문만 부탁드려요 :)'
+                        답변은 따뜻하고 간결하게, 여행자 유형에 따라 자연스럽게 인삿말을 포함해줘. ✨
+                        이모지 활용은 자유롭게 하되 너무 과하지 않게 써줘.
+                    """)
                 )
                 .put(new JSONObject()
                     .put("role", "user")
@@ -86,4 +102,5 @@ public class AiService {
                    .getString("content")
                    .trim();
     }
+
 }
