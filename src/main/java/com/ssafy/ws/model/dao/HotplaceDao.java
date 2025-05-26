@@ -28,14 +28,16 @@ public interface HotplaceDao {
 	public boolean hasUserLikedHotplace(int hotplaceId, String memberId);
 
 	public List<Hotplace> findAllByMemberId(String memberId);
-	
+
 	void insertComment(Comment comment);
-	
-    List<Comment> getCommentsByHotplaceId(int hotplaceId);
-    
-    void deleteComment(int commentId, String memberId);
-    
-    boolean updatePost(HotplacePost updatePost);
-    
-    void deletePost(int hotplaceId);
+
+	List<Comment> getCommentsByHotplaceId(int hotplaceId);
+
+	void deleteComment(int commentId, String memberId);
+
+	boolean updatePost(HotplacePost updatePost);
+
+	void deletePost(int hotplaceId);
+
+	List<Hotplace> findLikedPostsByMemberId(String memberId);
 }

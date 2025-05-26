@@ -311,4 +311,25 @@ public class HotPlaceController {
 		return ResponseEntity.ok("삭제 완료");
 	}
 
+	@GetMapping("/posts/liked")
+	public ResponseEntity<List<HotplaceListResponse>> getLikedHotplaces() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String memberId = authentication.getName();
+
+		List<Hotplace> likedPosts = hService.findLikedPostsByMemberId(memberId);
+		List<HotplaceListResponse> response = new ArrayList<>();
+
+		for (Hotplace hotplace : likedPosts) {
+			Member member = memberService.findById(hotplace.getMemberId());
+			String imageBase64 = ImageUtil.convertImageBytesToBase64(member.getProfileImage());
+
+			HotplaceListResponse dto = new HotplaceListResponse(hotplace.getHotplaceId(), member.getName(),
+					hotplace.getAttractionName(), hotplace.getTitle(), hotplace.getStarPoint(), hotplace.getImage(),
+					hotplace.getLikeCount(), imageBase64);
+			response.add(dto);
+		}
+
+		return ResponseEntity.ok(response);
+	}
+
 }

@@ -6,31 +6,41 @@
 <mapper namespace="com.ssafy.ws.model.dao.HotplaceDao">
 
 	<select id="findAllAttractions" resultMap="attMap">
-		select * from attractions;
+		select * from
+		attractions;
 	</select>
 
 	<insert id="createPost" parameterType="HotplacePost">
 		INSERT INTO hotplace (
 		member_id, attraction_no, title, star_point, content, image
 		) VALUES (
-		#{memberId}, #{attractionNo}, #{title}, #{rating}, #{content}, #{image}
+		#{memberId}, #{attractionNo}, #{title}, #{rating}, #{content},
+		#{image}
 		)
 	</insert>
 
 	<select id="getAllPosts" resultMap="hotplaceMap">
-		SELECT a.*, b.title as attraction_title,
-		(SELECT COUNT(*) FROM hotplace_likes WHERE hotplace_id = a.hotplace_id) AS
+		SELECT a.*, b.title as
+		attraction_title,
+		(SELECT COUNT(*) FROM hotplace_likes WHERE
+		hotplace_id = a.hotplace_id) AS
 		like_count
-		FROM hotplace a join attractions b on (a.attraction_no = b.no)
+		FROM hotplace a join
+		attractions b on (a.attraction_no = b.no)
 	</select>
 
 
 	<select id="getHotplaceById" resultMap="hotplaceMap">
-		select a.hotplace_id, a.member_id, a.attraction_no, a.title, b.title as
-		attraction_title, a.content, a.created_at, a.updated_at, a.star_point,
-		a.image, (SELECT COUNT(*) FROM hotplace_likes WHERE hotplace_id =
-		a.hotplace_id) AS like_count
-		from hotplace a join attractions b on (a.attraction_no = b.no) where
+		select a.hotplace_id,
+		a.member_id, a.attraction_no, a.title, b.title as
+		attraction_title,
+		a.content, a.created_at, a.updated_at, a.star_point,
+		a.image, (SELECT
+		COUNT(*) FROM hotplace_likes WHERE hotplace_id =
+		a.hotplace_id) AS
+		like_count
+		from hotplace a join attractions b on (a.attraction_no =
+		b.no) where
 		hotplace_id = #{hotplaceId}
 	</select>
 
@@ -40,53 +50,83 @@
 	</insert>
 
 	<delete id="Hotplacelikecancel">
-		DELETE FROM hotplace_likes WHERE hotplace_id = #{hotplaceId} and member_id =
+		DELETE FROM hotplace_likes WHERE hotplace_id =
+		#{hotplaceId} and member_id =
 		#{memberId}
 	</delete>
 
 	<select id="hasUserLikedHotplace" resultType="boolean">
 		SELECT COUNT(*) > 0
 		FROM hotplace_likes
-		WHERE hotplace_id = #{hotplaceId} AND member_id = #{memberId}
+		WHERE hotplace_id = #{hotplaceId} AND member_id =
+		#{memberId}
 	</select>
 
 	<select id="findAllByMemberId" resultMap="hotplaceMap">
-		SELECT a.*, b.title as attraction_title,
-		(SELECT COUNT(*) FROM hotplace_likes WHERE hotplace_id = a.hotplace_id) AS
+		SELECT a.*, b.title as
+		attraction_title,
+		(SELECT COUNT(*) FROM hotplace_likes WHERE
+		hotplace_id = a.hotplace_id) AS
 		like_count
-		FROM hotplace a join attractions b on (a.attraction_no = b.no)
+		FROM hotplace a join
+		attractions b on (a.attraction_no = b.no)
 		WHERE member_id = #{id}
 	</select>
-	
+
 	<insert id="insertComment">
-    INSERT INTO comment (hotplace_id, member_id, content, created_at)
-    VALUES (#{hotplaceId}, #{memberId}, #{content}, NOW())
-  </insert>
+		INSERT INTO comment (hotplace_id, member_id, content,
+		created_at)
+		VALUES (#{hotplaceId}, #{memberId}, #{content}, NOW())
+	</insert>
 
-  <select id="getCommentsByHotplaceId" resultMap="commentMap">
-    SELECT comment_id, hotplace_id, member_id, content, created_at
-    FROM comment
-    WHERE hotplace_id = #{hotplaceId}
-    ORDER BY created_at DESC
-  </select>
-  
-  <delete id="deleteComment">
-  DELETE FROM comment
-  WHERE comment_id = #{commentId} AND member_id = #{memberId}
-</delete>
+	<select id="getCommentsByHotplaceId" resultMap="commentMap">
+		SELECT
+		comment_id, hotplace_id, member_id, content, created_at
+		FROM comment
+		WHERE hotplace_id = #{hotplaceId}
+		ORDER BY created_at DESC
+	</select>
 
-<insert id="updatePost" parameterType="HotplacePost">
-		UPDATE hotplace SET member_id = #{memberId},
+	<delete id="deleteComment">
+		DELETE FROM comment
+		WHERE comment_id = #{commentId}
+		AND member_id = #{memberId}
+	</delete>
+
+	<insert id="updatePost" parameterType="HotplacePost">
+		UPDATE hotplace SET
+		member_id = #{memberId},
 		attraction_no = #{attractionNo},
-		title = #{title},
+		title =
+		#{title},
 		star_point = #{rating},
 		content = #{content},
-		image = #{image} WHERE hotplace_id = #{id}
+		image = #{image}
+		WHERE hotplace_id = #{id}
 	</insert>
-  
-<delete id="deletePost">
-  DELETE FROM hotplace WHERE hotplace_id = #{hotplaceId}
-</delete>
+
+	<delete id="deletePost">
+		DELETE FROM hotplace WHERE hotplace_id =
+		#{hotplaceId}
+	</delete>
+
+	<select id="findLikedPostsByMemberId" resultMap="hotplaceMap">
+		SELECT
+		a.*,
+		b.title AS attraction_title,
+		(
+		SELECT COUNT(*)
+		FROM hotplace_likes
+		WHERE
+		hotplace_id = a.hotplace_id
+		) AS like_count
+		FROM hotplace a
+		JOIN
+		attractions b ON a.attraction_no = b.no
+		JOIN hotplace_likes l ON
+		a.hotplace_id = l.hotplace_id
+		WHERE l.member_id = #{memberId}
+	</select>
 
 	<resultMap type="Att" id="attMap">
 		<id column="no" property="no" />
@@ -116,7 +156,7 @@
 		<result column="like_count" property="likeCount" />
 	</resultMap>
 
-<resultMap type="Comment" id="commentMap">
+	<resultMap type="Comment" id="commentMap">
 		<id column="comment_id" property="commentId" />
 		<result column="hotplace_id" property="hotplaceId" />
 		<result column="member_id" property="memberId" />

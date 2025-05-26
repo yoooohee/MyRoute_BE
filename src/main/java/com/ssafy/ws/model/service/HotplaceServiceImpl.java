@@ -58,34 +58,35 @@ public class HotplaceServiceImpl implements HotplaceService {
 	public List<Hotplace> findAllByMemberId(String id) {
 		return hotplaceDao.findAllByMemberId(id);
 	}
-	
+
 	@Override
-    public void addComment(int hotplaceId, String memberId, String content) {
-        Comment comment = Comment.builder()
-                .hotplaceId(hotplaceId)
-                .memberId(memberId)
-                .content(content)
-                .build();
-        hotplaceDao.insertComment(comment);
-    }
+	public void addComment(int hotplaceId, String memberId, String content) {
+		Comment comment = Comment.builder().hotplaceId(hotplaceId).memberId(memberId).content(content).build();
+		hotplaceDao.insertComment(comment);
+	}
 
-    @Override
-    public List<Comment> getComments(int hotplaceId) {
-        return hotplaceDao.getCommentsByHotplaceId(hotplaceId);
-    }
+	@Override
+	public List<Comment> getComments(int hotplaceId) {
+		return hotplaceDao.getCommentsByHotplaceId(hotplaceId);
+	}
 
-    @Override
+	@Override
 	public void deleteComment(int commentId, String memberId) {
 		hotplaceDao.deleteComment(commentId, memberId);
 	}
-	
-    @Override
+
+	@Override
 	public boolean updatePost(HotplacePost updatePost) {
 		return hotplaceDao.updatePost(updatePost);
 	}
-    
-    @Override
-    public void deletePost(int hotplaceId) {
-    	hotplaceDao.deletePost(hotplaceId);
-    }
+
+	@Override
+	public void deletePost(int hotplaceId) {
+		hotplaceDao.deletePost(hotplaceId);
+	}
+
+	@Override
+	public List<Hotplace> findLikedPostsByMemberId(String memberId) {
+		return hotplaceDao.findLikedPostsByMemberId(memberId);
+	}
 }

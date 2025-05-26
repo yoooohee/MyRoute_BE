@@ -25,15 +25,16 @@ public interface HotplaceService {
 	public boolean hasUserLikedHotplace(int hotplaceId, String memberId);
 
 	public List<Hotplace> findAllByMemberId(String memberId);
-	
+
 	void addComment(int hotplaceId, String memberId, String content);
-	
-    List<Comment> getComments(int hotplaceId);
-    
-    boolean updatePost(HotplacePost updatePost);
+
+	List<Comment> getComments(int hotplaceId);
+
+	boolean updatePost(HotplacePost updatePost);
 
 	void deleteComment(int commentId, String memberId);
-    
-    void deletePost(int hotplaceId);
 
+	void deletePost(int hotplaceId);
+
+	List<Hotplace> findLikedPostsByMemberId(String memberId);
 }
