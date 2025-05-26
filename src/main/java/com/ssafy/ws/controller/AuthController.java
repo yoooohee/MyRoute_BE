@@ -38,7 +38,6 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-		System.out.println("로그인");
 		Member loginMember = service.login(loginRequest);
 
 		if (loginMember == null) {

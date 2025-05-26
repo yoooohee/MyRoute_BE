@@ -26,7 +26,7 @@ public class MemberService {
 		member.encodePassword(member.getPassword());
 		member.initializeUserRole();
 		member.setDefaultImage();
-		
+
 		dao.memberRegister(member);
 	}
 
@@ -61,10 +61,10 @@ public class MemberService {
 
 	public void updateMemberInfo(String memberId, MemberUpdateRequest member) throws IOException {
 		dao.updateMemberInfo(memberId, member);
-		
+
 		if (member.getProfileImage() != null && !member.getProfileImage().isEmpty()) {
 			byte[] imageBytes = member.getProfileImage().getBytes();
-			dao.updateProfileImage(memberId, imageBytes);	
+			dao.updateProfileImage(memberId, imageBytes);
 		}
 	}
 
@@ -89,24 +89,24 @@ public class MemberService {
 		String password = request.getPassword();
 		dao.updatePassword(id, PasswordUtil.hashPassword(password));
 	}
-	
+
 	public byte[] findProfileImageById(String id) {
 		return dao.findProfileImageById(id);
 	}
-	
+
 	public int deleteMember(String id) {
 		return dao.deleteMember(id);
 	}
-	
-    public List<Notification> getNotifications(String memberId) {
-        return dao.getNotifications(memberId);
-    }
 
-    public void markAsRead(Long notificationId) {
-        dao.markAsRead(notificationId);
-    }
-    
-    public void deleteNotification(Long id) {
-    	dao.deleteNotification(id);
-    }
+	public List<Notification> getNotifications(String memberId) {
+		return dao.getNotifications(memberId);
+	}
+
+	public void markAsRead(Long notificationId) {
+		dao.markAsRead(notificationId);
+	}
+
+	public void deleteNotification(Long id) {
+		dao.deleteNotification(id);
+	}
 }

@@ -3,182 +3,276 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.ws.model.dao.AttDao">
-<select id="searchAtt" resultMap="attMap">
-select a.no, a.title, b.content_type_id, b.content_type_name, c.sido_name, d.gugun_name, a.overview, a.latitude, a.longitude, a.first_image1, a.addr1 from attractions a
-	    			join contenttypes b on (a.content_type_id = b.content_type_id)
-	    			join sidos c on (a.area_code = c.sido_code)
-	    			join guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code = d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun} and b.content_type_id like #{contentType}
-</select>
+	<select id="searchAtt" resultMap="attMap">
+		select a.no, a.title,
+		b.content_type_id, b.content_type_name, c.sido_name,
+		d.gugun_name,
+		a.overview, a.latitude, a.longitude, a.first_image1,
+		a.addr1 from
+		attractions a
+		join contenttypes b on (a.content_type_id =
+		b.content_type_id)
+		join sidos c on (a.area_code = c.sido_code)
+		join
+		guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code =
+		d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun}
+		and b.content_type_id like #{contentType}
+	</select>
 
-<select id="searchAttLocation" resultMap="attMap">
-select a.no, a.title, b.content_type_id, b.content_type_name, c.sido_name, d.gugun_name, a.overview, a.latitude, a.longitude, a.first_image1, a.addr1 
-					from attractions a
-	    			join contenttypes b on (a.content_type_id = b.content_type_id)
-	    			join sidos c on (a.area_code = c.sido_code)
-	    			join guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code = d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun} and b.content_type_id not in (32, 39)
-</select>
+	<select id="searchAttLocation" resultMap="attMap">
+		select a.no, a.title,
+		b.content_type_id, b.content_type_name, c.sido_name,
+		d.gugun_name,
+		a.overview, a.latitude, a.longitude, a.first_image1,
+		a.addr1
+		from
+		attractions a
+		join contenttypes b on (a.content_type_id =
+		b.content_type_id)
+		join sidos c on (a.area_code = c.sido_code)
+		join
+		guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code =
+		d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun}
+		and b.content_type_id not in (32, 39)
+	</select>
 
-<select id="sidonum" parameterType="string" resultType="int">
-select sido_code from sidos where sido_name = #{sido}
-</select>
+	<select id="sidonum" parameterType="string" resultType="int">
+		select
+		sido_code from sidos where sido_name = #{sido}
+	</select>
 
- <insert id="insertPlan" useGeneratedKeys="true" keyProperty="planId">
-    INSERT INTO plan (plan_name, member_id, budget, area_code, days, is_public)
-    VALUES (#{planName}, #{memberId}, #{budget}, #{areaCode}, #{days}, #{isPublic})
-  </insert>
+	<insert id="insertPlan" useGeneratedKeys="true"
+		keyProperty="planId">
+		INSERT INTO plan (plan_name, member_id, budget, area_code,
+		days, is_public)
+		VALUES (#{planName}, #{memberId}, #{budget},
+		#{areaCode}, #{days},
+		#{isPublic})
+	</insert>
 
-  <insert id="insertPlace">
-    INSERT INTO place (plan_id, attraction_no, visit_order)
-    VALUES
-    <foreach collection="places" item="p" separator=",">
-      (#{p.planId}, #{p.attractionNo}, #{p.visitOrder})
-    </foreach>
-  </insert>
-  
-  <select id="getPlanByUserId" resultMap="planMap">
-select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public, a.created_at, a.updated_at
-from plan a join sidos b on (a.area_code = b.sido_code) where a.member_id=#{userId}
-</select>
+	<insert id="insertPlace">
+		INSERT INTO place (plan_id, attraction_no, visit_order)
+		VALUES
+		<foreach collection="places" item="p" separator=",">
+			(#{p.planId},
+			#{p.attractionNo}, #{p.visitOrder})
+		</foreach>
+	</insert>
 
-<select id= "getPlanById" resultMap="planMap">
-select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public, a.created_at, a.updated_at
-from plan a join sidos b on (a.area_code = b.sido_code) where a.plan_id=#{planId}
-</select>
+	<select id="getPlanByUserId" resultMap="planMap">
+		select a.plan_id,
+		a.plan_name, a.member_id, a.budget, b.sido_name, a.days,
+		a.is_public,
+		a.created_at, a.updated_at
+		from plan a join sidos b on (a.area_code =
+		b.sido_code) where
+		a.member_id=#{userId}
+	</select>
 
-<select id= "getPlacesByPlanId" resultMap = "placeMap">
-select a.plan_id, a.attraction_no, a.visit_order, b.latitude, b.longitude, b.title, b.first_image1, b.addr1, c.content_type_name, b.overview
-from place a join attractions b on a.attraction_no = b.no join contenttypes c on b.content_type_id = c.content_type_id where plan_id = #{planId}
-</select>
+	<select id="getPlanById" resultMap="planMap">
+		select a.plan_id,
+		a.plan_name, a.member_id, a.budget, b.sido_name, a.days,
+		a.is_public,
+		a.created_at, a.updated_at
+		from plan a join sidos b on (a.area_code =
+		b.sido_code) where
+		a.plan_id=#{planId}
+	</select>
 
-<delete id="deletePlaceByPlanId">
-  DELETE FROM place WHERE plan_id = #{planId}
-</delete>
+	<select id="getPlacesByPlanId" resultMap="placeMap">
+		select a.plan_id,
+		a.attraction_no, a.visit_order, b.latitude, b.longitude,
+		b.title,
+		b.first_image1, b.addr1, c.content_type_name, b.overview
+		from place a
+		join attractions b on a.attraction_no = b.no join
+		contenttypes c on
+		b.content_type_id = c.content_type_id where plan_id
+		= #{planId}
+	</select>
 
-<delete id="deletePlanByPlanId">
-  DELETE FROM plan WHERE plan_id = #{planId}
-</delete>
+	<delete id="deletePlaceByPlanId">
+		DELETE FROM place WHERE plan_id = #{planId}
+	</delete>
 
-<update id="updatePlan">
-  UPDATE plan
-  SET plan_name = #{planName},
-      budget = #{budget},
-      days = #{days},
-      area_code = #{areaCode},
-      is_public = #{isPublic}
-  WHERE plan_id = #{planId}
-</update>
+	<delete id="deletePlanByPlanId">
+		DELETE FROM plan WHERE plan_id = #{planId}
+	</delete>
 
-  <select id="getPublicPlans" resultMap="planWithLikeMap">
-select a.plan_id, a.plan_name, a.member_id, a.budget, b.sido_name, a.days, a.is_public, a.created_at, a.updated_at,
- (SELECT COUNT(*) FROM plan_likes WHERE plan_id = a.plan_id) AS like_count
-from plan a join sidos b on (a.area_code = b.sido_code) where a.is_public = 1
-</select>
+	<update id="updatePlan">
+		UPDATE plan
+		SET plan_name = #{planName},
+		budget =
+		#{budget},
+		days = #{days},
+		area_code = #{areaCode},
+		is_public =
+		#{isPublic}
+		WHERE plan_id = #{planId}
+	</update>
 
- <insert id="Planlike">
-    INSERT INTO plan_likes (plan_id, member_id)
-    VALUES (#{planId}, #{memberId})
-  </insert>
-  
-  <delete id="Planlikecancel">
-  DELETE FROM plan_likes WHERE plan_id = #{planId} and member_id = #{memberId}
-</delete>
+	<select id="getPublicPlans" resultMap="planWithLikeMap">
+		select a.plan_id,
+		a.plan_name, a.member_id, a.budget, b.sido_name, a.days,
+		a.is_public,
+		a.created_at, a.updated_at,
+		(SELECT COUNT(*) FROM plan_likes WHERE
+		plan_id = a.plan_id) AS like_count
+		from plan a join sidos b on
+		(a.area_code = b.sido_code) where
+		a.is_public = 1
+	</select>
 
-<select id="getPlanByIdWithLike" resultMap="planWithLikeMap">
-  SELECT a.plan_id, a.plan_name, a.member_id, a.budget,
-         b.sido_name, a.days, a.is_public,
-         (SELECT COUNT(*) FROM plan_likes WHERE plan_id = a.plan_id) AS like_count, a.created_at, a.updated_at
-  FROM plan a
-  JOIN sidos b ON a.area_code = b.sido_code
-  WHERE a.plan_id = #{planId}
-</select>
+	<insert id="Planlike">
+		INSERT INTO plan_likes (plan_id, member_id)
+		VALUES
+		(#{planId}, #{memberId})
+	</insert>
 
-<select id="hasUserLikedPlan" resultType="boolean">
-  SELECT COUNT(*) > 0
-  FROM plan_likes
-  WHERE plan_id = #{planId} AND member_id = #{memberId}
-</select>
+	<delete id="Planlikecancel">
+		DELETE FROM plan_likes WHERE plan_id = #{planId} and
+		member_id = #{memberId}
+	</delete>
 
-<select id="getAvgRating" parameterType="int" resultType="double">
-    SELECT IFNULL(AVG(star_point), 0)
-    FROM hotplace
-    WHERE attraction_no = #{attractionNo}
-</select>
+	<select id="getPlanByIdWithLike" resultMap="planWithLikeMap">
+		SELECT a.plan_id,
+		a.plan_name, a.member_id, a.budget,
+		b.sido_name, a.days, a.is_public,
+		(SELECT COUNT(*) FROM plan_likes WHERE plan_id = a.plan_id) AS
+		like_count,
+		a.created_at, a.updated_at
+		FROM plan a
+		JOIN sidos b ON
+		a.area_code = b.sido_code
+		WHERE a.plan_id = #{planId}
+	</select>
 
-  <insert id="insertFavorite">
-    INSERT INTO favorite_place (member_id, attraction_no)
-    VALUES (#{memberId}, #{attractionNo})
-  </insert>
+	<select id="hasUserLikedPlan" resultType="boolean">
+		SELECT COUNT(*) > 0
+		FROM plan_likes
+		WHERE plan_id = #{planId} AND member_id = #{memberId}
+	</select>
 
-  <delete id="deleteFavorite">
-    DELETE FROM favorite_place
-    WHERE member_id = #{memberId} AND attraction_no = #{attractionNo}
-  </delete>
+	<select id="getAvgRating" parameterType="int"
+		resultType="double">
+		SELECT IFNULL(AVG(star_point), 0)
+		FROM hotplace
+		WHERE
+		attraction_no = #{attractionNo}
+	</select>
 
-  <select id="isFavorite" resultType="boolean">
-    SELECT COUNT(*) > 0 FROM favorite_place
-    WHERE member_id = #{memberId} AND attraction_no = #{attractionNo}
-  </select>
-  
-  <select id="getAllFavoriteAttractionNos" resultType="int">
-  SELECT attraction_no FROM favorite_place WHERE member_id = #{memberId}
-</select>
+	<insert id="insertFavorite">
+		INSERT INTO favorite_place (member_id, attraction_no)
+		VALUES (#{memberId}, #{attractionNo})
+	</insert>
 
-<insert id="insertNotification">
-  INSERT INTO notification (member_id, type, content, url, is_read, created_at)
-  VALUES (#{memberId}, #{type}, #{content}, #{url}, #{isRead}, #{createdAt})
-</insert>
+	<delete id="deleteFavorite">
+		DELETE FROM favorite_place
+		WHERE member_id =
+		#{memberId} AND attraction_no = #{attractionNo}
+	</delete>
 
-  
+	<select id="isFavorite" resultType="boolean">
+		SELECT COUNT(*) > 0 FROM
+		favorite_place
+		WHERE member_id = #{memberId} AND attraction_no =
+		#{attractionNo}
+	</select>
+
+	<select id="getAllFavoriteAttractionNos" resultType="int">
+		SELECT
+		attraction_no FROM favorite_place WHERE member_id = #{memberId}
+	</select>
+
+	<insert id="insertNotification">
+		INSERT INTO notification (member_id, type, content,
+		url, is_read,
+		created_at)
+		VALUES (#{memberId}, #{type}, #{content},
+		#{url}, #{isRead}, #{createdAt})
+	</insert>
+
+	<select id="findPlansLikedByMemberId" parameterType="string"
+		resultType="com.ssafy.ws.model.dto.response.PlanResponse">
+		SELECT
+		p.plan_id AS planId,
+		p.plan_name AS planName,
+		m.name AS
+		memberName,
+		(
+		SELECT s.sido_name
+		FROM guguns g
+		JOIN sidos s ON g.sido_code
+		= s.sido_code
+		WHERE g.gugun_code = p.area_code
+		LIMIT 1
+		) AS areaName,
+		(
+		SELECT COUNT(*)
+		FROM plan_likes
+		WHERE plan_id = p.plan_id
+		) AS likeCount
+		FROM plan p
+		JOIN member m ON p.member_id = m.id
+		WHERE p.plan_id IN (
+		SELECT plan_id
+		FROM plan_likes
+		WHERE member_id = #{memberId}
+		)
+		AND
+		p.is_public = 1
+	</select>
+
 	<resultMap type="Att" id="attMap">
-	<id column="no" property="no"/>
-	<result column="title" property="title"/>
-	<result column="content_type_id" property="content_type_id"/>
-	<result column="content_type_name" property="content_type_name"/>
-	<result column="sido_name" property="sido_name"/>
-	<result column="gugun_name" property="gugun_name"/>
-	<result column="overview" property="overview"/>
-	<result column="latitude" property="latitude"/>
-	<result column="longitude" property="longitude"/>
-	<result column="first_image1" property="first_image1"/>
-	<result column="addr1" property="addr1"/>
+		<id column="no" property="no" />
+		<result column="title" property="title" />
+		<result column="content_type_id" property="content_type_id" />
+		<result column="content_type_name" property="content_type_name" />
+		<result column="sido_name" property="sido_name" />
+		<result column="gugun_name" property="gugun_name" />
+		<result column="overview" property="overview" />
+		<result column="latitude" property="latitude" />
+		<result column="longitude" property="longitude" />
+		<result column="first_image1" property="first_image1" />
+		<result column="addr1" property="addr1" />
 	</resultMap>
-	
+
 	<resultMap type="Plan" id="planMap">
-	<id column="plan_id" property="planId"/>
-	<result column="plan_name" property="planName"/>
-	<result column="member_id" property="memberId"/>
-	<result column="budget" property="budget"/>
-	<result column="sido_name" property="areaName"/>
-	<result column="days" property="days"/>
-	<result column="is_public" property="isPublic"/>
-	<result column="created_at" property="createdAt" />
+		<id column="plan_id" property="planId" />
+		<result column="plan_name" property="planName" />
+		<result column="member_id" property="memberId" />
+		<result column="budget" property="budget" />
+		<result column="sido_name" property="areaName" />
+		<result column="days" property="days" />
+		<result column="is_public" property="isPublic" />
+		<result column="created_at" property="createdAt" />
 		<result column="updated_at" property="updatedAt" />
 	</resultMap>
-	
+
 	<resultMap type="Place" id="placeMap">
-	<result column="plan_id" property="planId"/>
-	<result column="attraction_no" property="attractionNo"/>
-	<result column="visit_order" property="visitOrder"/>
-	<result column="latitude" property="latitude"/>
-	<result column="longitude" property="longitude"/>
-	<result column="title" property="placeName"/>
-	<result column="first_image1" property="first_image1"/>
-	<result column="addr1" property="addr1"/>
-	<result column="content_type_name" property="content_type_name"/>
-	<result column="overview" property="overview"/>
+		<result column="plan_id" property="planId" />
+		<result column="attraction_no" property="attractionNo" />
+		<result column="visit_order" property="visitOrder" />
+		<result column="latitude" property="latitude" />
+		<result column="longitude" property="longitude" />
+		<result column="title" property="placeName" />
+		<result column="first_image1" property="first_image1" />
+		<result column="addr1" property="addr1" />
+		<result column="content_type_name" property="content_type_name" />
+		<result column="overview" property="overview" />
 	</resultMap>
-	
+
 	<resultMap type="Plan" id="planWithLikeMap">
-  <id column="plan_id" property="planId"/>
-  <result column="plan_name" property="planName"/>
-  <result column="member_id" property="memberId"/>
-  <result column="budget" property="budget"/>
-  <result column="sido_name" property="areaName"/>
-  <result column="days" property="days"/>
-  <result column="is_public" property="isPublic"/>
-  <result column="like_count" property="likeCount"/>
-  <result column="created_at" property="createdAt" />
+		<id column="plan_id" property="planId" />
+		<result column="plan_name" property="planName" />
+		<result column="member_id" property="memberId" />
+		<result column="budget" property="budget" />
+		<result column="sido_name" property="areaName" />
+		<result column="days" property="days" />
+		<result column="is_public" property="isPublic" />
+		<result column="like_count" property="likeCount" />
+		<result column="created_at" property="createdAt" />
 		<result column="updated_at" property="updatedAt" />
-</resultMap>
+	</resultMap>
 
 </mapper>
