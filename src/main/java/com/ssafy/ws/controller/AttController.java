@@ -328,4 +328,20 @@ public class AttController {
 		return ResponseEntity.ok(likedPlans);
 	}
 
+	@GetMapping("/my-favorite/all")
+	public ResponseEntity<?> findAllFavoriteByMemberId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication == null || !authentication.isAuthenticated()
+				|| "anonymousUser".equals(authentication.getPrincipal())) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+
+		String memberId = authentication.getName();
+		List<Integer> favoriteAttractionNos = aService.getAllFavoriteAttractionNos(memberId);
+		List<Att> favoriteAttractions = favoriteAttractionNos.stream().map(aService::findAttById)
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(favoriteAttractions);
+	}
 }

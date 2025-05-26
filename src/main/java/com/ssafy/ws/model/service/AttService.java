@@ -50,4 +50,6 @@ public interface AttService {
 	List<Integer> getAllFavoriteAttractionNos(String memberId);
 
 	List<PlanResponse> findPlansLikedByMemberId(String memberId);
+	
+	Att findAttById(int attractionNo);
 }

@@ -2,7 +2,6 @@ package com.ssafy.ws.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -238,26 +237,7 @@ public class HotPlaceController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시글을 찾을 수 없습니다.");
 		}
 
-		String mimeType = "image/jpeg";
-		byte[] imageBytes = hotplace.getImage();
-		if (imageBytes != null) {
-			try {
-				mimeType = java.net.URLConnection
-						.guessContentTypeFromStream(new java.io.ByteArrayInputStream(imageBytes));
-				if (mimeType == null) {
-					String str = new String(imageBytes);
-					if (str.trim().startsWith("<svg")) {
-						mimeType = "image/svg+xml";
-					}
-				}
-			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 오류");
-			}
-		}
-
-		String imageBase64 = (imageBytes != null)
-				? "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes)
-				: null;
+		String imageBase64 = ImageUtil.convertImageBytesToBase64(hotplace.getImage());
 
 		Map<String, Object> result = new HashMap<>();
 		result.put("title", hotplace.getTitle());

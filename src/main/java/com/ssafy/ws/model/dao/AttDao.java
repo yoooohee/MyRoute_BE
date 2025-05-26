@@ -60,4 +60,6 @@ public interface AttDao {
 	void insertNotification(Notification notification);
 
 	List<PlanResponse> findPlansLikedByMemberId(String memberId);
+
+	Att findAttById(int attractionNo);
 }

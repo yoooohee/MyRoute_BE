@@ -173,4 +173,8 @@ public class AttServiceImpl implements AttService {
 		return dao.findPlansLikedByMemberId(memberId);
 	}
 
+	@Override
+	public 	Att findAttById(int attractionNo) {
+		return dao.findAttById(attractionNo);
+	}
 }
