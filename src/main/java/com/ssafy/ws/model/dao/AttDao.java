@@ -32,6 +32,8 @@ public interface AttDao {
 	void deletePlaceByPlanId(int planId);
 
 	void deletePlanByPlanId(int planId);
+	
+	void deletelikesByPlanId(int planId);
 
 	void updatePlan(Plan plan);
 

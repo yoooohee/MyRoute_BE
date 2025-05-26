@@ -38,6 +38,10 @@ public interface HotplaceDao {
 	boolean updatePost(HotplacePost updatePost);
 
 	void deletePost(int hotplaceId);
+	
+	void deletelikesByHotplaceId(int hotplaceId);
 
 	List<Hotplace> findLikedPostsByMemberId(String memberId);
+	
+	void deletecommentsByHotplaceId(int hotplaceId);
 }

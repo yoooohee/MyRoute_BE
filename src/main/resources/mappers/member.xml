@@ -61,6 +61,22 @@
 		WHERE id = #{id}
 	</delete>
 	
+	<delete id="deletePlanLikesByUserId">
+		delete from plan_likes where member_id = #{userId}
+	</delete>
+	
+	<delete id="deletePlaceLikesByUserId">
+		delete from hotplace_likes where member_id = #{userId}
+	</delete>
+	
+	<delete id="deleteCommentsByUserId">
+		delete from comment where member_id = #{userId}
+	</delete>
+	
+	<delete id="deletefavoriteplacesByUserId">
+		delete from favorite_place where member_id = #{userId}
+	</delete>
+	
 	<delete id="deleteNotification">
 		DELETE FROM notification
 		WHERE notification_id = #{id}

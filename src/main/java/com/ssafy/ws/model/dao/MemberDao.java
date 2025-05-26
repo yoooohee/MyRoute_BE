@@ -55,4 +55,14 @@ public interface MemberDao {
     void deleteNotification(Long id);
     
     void clearNotification(String memberId);
+    
+    void deletePlanLikesByUserId(String userId);
+    
+    void deletePlaceLikesByUserId(String userId);
+    
+    void deleteCommentsByUserId(String userId);
+    
+    void deletefavoriteplacesByUserId(String userId);
+    
+    void deletenotification(String userId);
 }
