@@ -90,7 +90,7 @@ public class HotPlaceController {
 			String imageBase64 = ImageUtil.convertImageBytesToBase64(member.getProfileImage());
 
 			HotplaceListResponse dto = new HotplaceListResponse(hotplace.getHotplaceId(), member.getName(),
-					hotplace.getAttractionName(), hotplace.getTitle(), hotplace.getStarPoint(), hotplace.getImage(),
+					hotplace.getAttractionNo(), hotplace.getAttractionName(), hotplace.getTitle(), hotplace.getStarPoint(), hotplace.getImage(),
 					hotplace.getLikeCount(), imageBase64);
 			response.add(dto);
 		}
@@ -304,7 +304,7 @@ public class HotPlaceController {
 			String imageBase64 = ImageUtil.convertImageBytesToBase64(member.getProfileImage());
 
 			HotplaceListResponse dto = new HotplaceListResponse(hotplace.getHotplaceId(), member.getName(),
-					hotplace.getAttractionName(), hotplace.getTitle(), hotplace.getStarPoint(), hotplace.getImage(),
+					hotplace.getAttractionNo(),  hotplace.getAttractionName(), hotplace.getTitle(), hotplace.getStarPoint(), hotplace.getImage(),
 					hotplace.getLikeCount(), imageBase64);
 			response.add(dto);
 		}

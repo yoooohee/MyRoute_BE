@@ -8,6 +8,7 @@ import lombok.Getter;
 public class HotplaceListResponse {
 	private Integer hotplaceId;
 	private String memberName;
+	private Integer attractionNo;
 	private String attractionName;
 	private String title;
 	private double starPoint;
