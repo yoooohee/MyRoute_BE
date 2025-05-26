@@ -104,6 +104,8 @@ public class HotplaceServiceImpl implements HotplaceService {
 	@Override
 	public void deletePost(int hotplaceId) {
 		hotplaceDao.deletePost(hotplaceId);
+		hotplaceDao.deletelikesByHotplaceId(hotplaceId);
+		hotplaceDao.deletecommentsByHotplaceId(hotplaceId);
 	}
 
 	@Override

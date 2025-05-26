@@ -102,6 +102,7 @@ public class AttServiceImpl implements AttService {
 	public void deletePlan(int planId) {
 		dao.deletePlaceByPlanId(planId);
 		dao.deletePlanByPlanId(planId);
+		dao.deletelikesByPlanId(planId);
 	}
 
 	@Override

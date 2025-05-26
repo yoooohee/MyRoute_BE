@@ -54,6 +54,14 @@
 		#{hotplaceId} and member_id =
 		#{memberId}
 	</delete>
+	
+	<delete id="deletelikesByHotplaceId">
+		DELETE FROM hotplace_likes where hotplace_id = #{hotplaceId}
+	</delete>
+	
+	<delete id="deletecommentsByHotplaceId">
+		DELETE FROM comment where hotplace_id = #{hotplaceId}
+	</delete>
 
 	<select id="hasUserLikedHotplace" resultType="boolean">
 		SELECT COUNT(*) > 0

@@ -98,6 +98,10 @@
 	<delete id="deletePlanByPlanId">
 		DELETE FROM plan WHERE plan_id = #{planId}
 	</delete>
+	
+	<delete id="deletelikesByPlanId">
+		DELETE FROM plan_likes where plan_id = #{planId}
+	</delete>
 
 	<update id="updatePlan">
 		UPDATE plan

@@ -5,9 +5,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.ssafy.ws.model.dao.AttDao;
+import com.ssafy.ws.model.dao.HotplaceDao;
 import com.ssafy.ws.model.dao.MemberDao;
+import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.Notification;
+import com.ssafy.ws.model.dto.Plan;
 import com.ssafy.ws.model.dto.request.LoginRequest;
 import com.ssafy.ws.model.dto.request.MemberUpdateRequest;
 import com.ssafy.ws.model.dto.request.PasswordChangeRequest;
@@ -21,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
 	private final MemberDao dao;
+	private final AttDao attdao;
+	private final HotplaceDao hotplaceDao;
 
 	public void signIn(Member member) throws Exception {
 		member.encodePassword(member.getPassword());
@@ -94,8 +100,30 @@ public class MemberService {
 		return dao.findProfileImageById(id);
 	}
 
-	public int deleteMember(String id) {
-		return dao.deleteMember(id);
+	public int deleteMember(String userId) {
+		List<Plan> planids = attdao.getPlanByUserId(userId);
+		
+		for (Plan planid : planids) {
+			attdao.deletePlaceByPlanId(planid.getPlanId());
+			attdao.deletePlanByPlanId(planid.getPlanId());
+			attdao.deletelikesByPlanId(planid.getPlanId());
+		}
+		
+		List<Hotplace> hotplaces = hotplaceDao.findAllByMemberId(userId);
+		
+		for (Hotplace hotplaceid : hotplaces) {
+			hotplaceDao.deletePost(hotplaceid.getHotplaceId());
+			hotplaceDao.deletelikesByHotplaceId(hotplaceid.getHotplaceId());
+			hotplaceDao.deletecommentsByHotplaceId(hotplaceid.getHotplaceId());
+		}
+		
+		dao.deletePlanLikesByUserId(userId);
+		dao.deletePlaceLikesByUserId(userId);
+		dao.deleteCommentsByUserId(userId);
+		dao.deletefavoriteplacesByUserId(userId);
+		dao.clearNotification(userId);
+		
+		return dao.deleteMember(userId);
 	}
 
 	public List<Notification> getNotifications(String memberId) {
