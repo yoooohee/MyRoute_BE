@@ -44,4 +44,14 @@
 		DELETE FROM NOTICE
 		WHERE NOTICE_ID = #{id}
 	</delete>
+	
+	<select id="findlastnoticeno">
+		select max(notice_id) from notice
+	</select>
+	
+	<select id="findAllUserIds" resultType="string">
+    SELECT id
+    FROM member
+    WHERE role != 'ADMIN'
+	</select>
 </mapper>

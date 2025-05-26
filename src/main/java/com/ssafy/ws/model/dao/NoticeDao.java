@@ -19,4 +19,8 @@ public interface NoticeDao {
 	public void update(NoticeUpdateRequest notice);
 
 	public void delete(int id);
+	
+	public int findlastnoticeno();
+	
+	List<String> findAllUserIds();
 }
