@@ -26,7 +26,6 @@ public class Att {
     private int si_gun_gu_code; //구군코드
     private String tel; //전화번호
     private String title; //명소이름
-    
 
 	private double avgRating;
     private String content_type_name; //콘텐츠타입이름

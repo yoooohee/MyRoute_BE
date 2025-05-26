@@ -12,6 +12,8 @@ import com.ssafy.ws.model.dto.response.PlanResponse;
 public interface AttService {
 
 	List<Att> searchAtt(String sido, String gugun, int contentType) throws SQLException;
+	
+	List<Att> searchallAtt(String sido, String gugun, int contentType) throws SQLException;
 
 	List<Att> searchAttLocation(String sido, String gugun) throws SQLException;
 

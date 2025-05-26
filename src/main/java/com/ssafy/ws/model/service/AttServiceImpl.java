@@ -27,6 +27,11 @@ public class AttServiceImpl implements AttService {
 	public List<Att> searchAtt(String sido, String gugun, int contentType) throws SQLException {
 		return dao.searchAtt(sido, gugun, contentType);
 	}
+	
+	@Override
+	public List<Att> searchallAtt(String sido, String gugun, int contentType) throws SQLException {
+		return dao.searchallAtt(sido, gugun, contentType);
+	}
 
 	@Override
 	public List<Att> searchAttLocation(String sido, String gugun) throws SQLException {

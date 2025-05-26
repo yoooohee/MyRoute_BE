@@ -92,12 +92,20 @@ public class AttController {
 
 	@PostMapping("/attplan")
 	public ResponseEntity<List<Att>> getAttractions(@RequestBody AttPlanRequest request) throws SQLException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String memberId = authentication.getName();
+		
 		String sido = request.getSido();
 		String gugun = request.getGugun();
 		int attId = request.getAtt_id();
 
 		List<Att> atts = (attId == 0) ? aService.searchAttLocation(sido, gugun)
 				: aService.searchAtt(sido, gugun, attId);
+		
+		atts = (attId == -1) ? aService.searchallAtt(sido, gugun, attId)
+				: atts;
+		
+		System.out.println(atts.size());
 
 		for (Att att : atts) {
 			try {

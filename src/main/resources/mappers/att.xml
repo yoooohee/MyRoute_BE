@@ -3,6 +3,37 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.ws.model.dao.AttDao">
+	<select id="searchAtt" resultMap="attMap">
+		select a.no, a.title,
+		b.content_type_id, b.content_type_name, c.sido_name,
+		d.gugun_name,
+		a.overview, a.latitude, a.longitude, a.first_image1,
+		a.addr1 from
+		attractions a
+		join contenttypes b on (a.content_type_id =
+		b.content_type_id)
+		join sidos c on (a.area_code = c.sido_code)
+		join
+		guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code =
+		d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun}
+		and b.content_type_id like #{contentType}
+	</select>
+	
+	<select id="searchallAtt" resultMap="attMap">
+		select a.no, a.title,
+		b.content_type_id, b.content_type_name, c.sido_name,
+		d.gugun_name,
+		a.overview, a.latitude, a.longitude, a.first_image1,
+		a.addr1 from
+		attractions a
+		join contenttypes b on (a.content_type_id =
+		b.content_type_id)
+		join sidos c on (a.area_code = c.sido_code)
+		join
+		guguns d on (a.area_code = d.sido_code and a.si_gun_gu_code =
+		d.gugun_code) where c.sido_name = #{sido} and d.gugun_name = #{gugun}
+	</select>
+	
 	<select id="findAttById" resultMap="attMap">
 		select a.no, a.title,
 		b.content_type_id, b.content_type_name, c.sido_name,

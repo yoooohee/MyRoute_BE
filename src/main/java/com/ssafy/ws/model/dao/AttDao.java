@@ -14,6 +14,8 @@ import com.ssafy.ws.model.dto.response.PlanResponse;
 @Mapper
 public interface AttDao {
 	List<Att> searchAtt(String sido, String gugun, int contentType);
+	
+	List<Att> searchallAtt(String sido, String gugun, int contentType);
 
 	List<Att> searchAttLocation(String sido, String gugun);
 
