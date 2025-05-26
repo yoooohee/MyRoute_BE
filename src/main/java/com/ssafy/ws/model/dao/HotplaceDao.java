@@ -9,6 +9,7 @@ import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.response.HotplacePost;
+import com.ssafy.ws.model.dto.response.TopWriterResponse;
 
 @Mapper
 public interface HotplaceDao {
@@ -44,4 +45,6 @@ public interface HotplaceDao {
 	List<Hotplace> findLikedPostsByMemberId(String memberId);
 	
 	void deletecommentsByHotplaceId(int hotplaceId);
+	
+	List<TopWriterResponse> findTopWritersOfCurrentMonth();
 }

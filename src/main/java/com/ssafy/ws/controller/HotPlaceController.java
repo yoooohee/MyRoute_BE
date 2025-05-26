@@ -31,6 +31,7 @@ import com.ssafy.ws.model.dto.response.CommentResponse;
 import com.ssafy.ws.model.dto.response.HotplaceDetailResponse;
 import com.ssafy.ws.model.dto.response.HotplaceListResponse;
 import com.ssafy.ws.model.dto.response.HotplacePost;
+import com.ssafy.ws.model.dto.response.TopWriterResponse;
 import com.ssafy.ws.model.service.HotplaceServiceImpl;
 import com.ssafy.ws.model.service.MemberService;
 import com.ssafy.ws.util.ImageUtil;
@@ -311,5 +312,13 @@ public class HotPlaceController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	 @GetMapping("/top-writers")
+	    public ResponseEntity<List<TopWriterResponse>> getTopWritersOfMonth() {
+	        List<TopWriterResponse> topWriters = hService.getTopWritersOfMonth();
+	        topWriters.add(new TopWriterResponse("aa", 3));
+	        topWriters.add(new TopWriterResponse("bb", 3));
+	        return ResponseEntity.ok(topWriters);
+	    }
 
 }

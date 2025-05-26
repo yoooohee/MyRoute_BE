@@ -13,6 +13,7 @@ import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.Notification;
 import com.ssafy.ws.model.dto.response.HotplacePost;
+import com.ssafy.ws.model.dto.response.TopWriterResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -112,4 +113,9 @@ public class HotplaceServiceImpl implements HotplaceService {
 	public List<Hotplace> findLikedPostsByMemberId(String memberId) {
 		return hotplaceDao.findLikedPostsByMemberId(memberId);
 	}
+	
+	@Override
+	public List<TopWriterResponse> getTopWritersOfMonth() {
+        return hotplaceDao.findTopWritersOfCurrentMonth();
+    }
 }

@@ -7,6 +7,7 @@ import com.ssafy.ws.model.dto.Att;
 import com.ssafy.ws.model.dto.Comment;
 import com.ssafy.ws.model.dto.Hotplace;
 import com.ssafy.ws.model.dto.response.HotplacePost;
+import com.ssafy.ws.model.dto.response.TopWriterResponse;
 
 public interface HotplaceService {
 
@@ -37,4 +38,6 @@ public interface HotplaceService {
 	void deletePost(int hotplaceId);
 
 	List<Hotplace> findLikedPostsByMemberId(String memberId);
+	
+	List<TopWriterResponse> getTopWritersOfMonth();
 }

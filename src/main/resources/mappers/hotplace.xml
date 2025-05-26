@@ -135,6 +135,18 @@
 		a.hotplace_id = l.hotplace_id
 		WHERE l.member_id = #{memberId}
 	</select>
+	
+	<select id="findTopWritersOfCurrentMonth" resultType="com.ssafy.ws.model.dto.response.TopWriterResponse">
+    SELECT member_id AS memberId,
+           COUNT(*) AS postCount
+    FROM hotplace
+    WHERE MONTH(created_at) = MONTH(NOW())
+      AND YEAR(created_at) = YEAR(NOW())
+    GROUP BY member_id
+    ORDER BY postCount DESC
+    LIMIT 3
+</select>
+
 
 	<resultMap type="Att" id="attMap">
 		<id column="no" property="no" />
