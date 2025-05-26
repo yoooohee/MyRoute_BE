@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.ws.config.TokenProvider;
 import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.request.EmailVerificationReqeust;
 import com.ssafy.ws.model.dto.request.LoginRequest;
@@ -16,7 +17,6 @@ import com.ssafy.ws.model.dto.response.LoginResponse;
 import com.ssafy.ws.model.service.MailService;
 import com.ssafy.ws.model.service.MemberService;
 import com.ssafy.ws.util.ImageUtil;
-import com.ssafy.ws.util.JwtUtil;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class AuthController {
 
 	private final MemberService service;
 	private final MailService mailService;
-	private final JwtUtil jwtUtil;
+	private final TokenProvider tokenProvider;
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> signup(@RequestBody Member member) throws Exception {
@@ -44,7 +44,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 일치하지 않습니다.");
 		}
 
-		String token = jwtUtil.generateToken(loginRequest.getId());
+		String token = tokenProvider.generateToken(loginRequest.getId());
 		String imageBase64 = ImageUtil.convertImageBytesToBase64(loginMember.getProfileImage());
 
 		return ResponseEntity.ok()
