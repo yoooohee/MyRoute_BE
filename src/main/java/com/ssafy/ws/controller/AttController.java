@@ -104,8 +104,6 @@ public class AttController {
 		
 		atts = (attId == -1) ? aService.searchallAtt(sido, gugun, attId)
 				: atts;
-		
-		System.out.println(atts.size());
 
 		for (Att att : atts) {
 			try {
