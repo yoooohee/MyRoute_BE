@@ -123,4 +123,12 @@ public class MemberController {
 	    service.deleteNotification(id);
 	    return ResponseEntity.ok().build();
 	}
+	
+	@DeleteMapping("/notification/clear")
+	public ResponseEntity<?> clearNotification() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String memberId = authentication.getName();
+	    service.clearNotification(memberId);
+	    return ResponseEntity.ok().build();
+	}
 }

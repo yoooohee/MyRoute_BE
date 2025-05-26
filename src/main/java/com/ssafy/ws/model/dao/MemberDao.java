@@ -53,4 +53,6 @@ public interface MemberDao {
     void markAsRead(Long notificationId);
     
     void deleteNotification(Long id);
+    
+    void clearNotification(String memberId);
 }

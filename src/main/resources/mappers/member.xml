@@ -66,6 +66,10 @@
 		WHERE notification_id = #{id}
 	</delete>
 
+	<delete id="clearNotification">
+		DELETE FROM notification
+		WHERE member_id = #{memberId}
+	</delete>
 
 	<resultMap id="memberResultMap"
 		type="com.ssafy.ws.model.dto.Member">

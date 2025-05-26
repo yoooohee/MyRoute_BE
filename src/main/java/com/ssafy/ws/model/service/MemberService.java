@@ -109,4 +109,8 @@ public class MemberService {
 	public void deleteNotification(Long id) {
 		dao.deleteNotification(id);
 	}
+	
+	public void clearNotification(String memberId) {
+		dao.clearNotification(memberId);
+	}
 }
