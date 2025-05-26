@@ -7,11 +7,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class NoticeDetailResponse {
+public class NoticeListResponse {
 	private Integer noticeId;
 	private String title;
-	private String content;
 	private String memberName;
 	private LocalDateTime createAt;
-	private String profileImage;
 }

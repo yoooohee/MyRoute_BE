@@ -1,8 +1,7 @@
 package com.ssafy.ws.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +20,8 @@ import com.ssafy.ws.model.dto.Member;
 import com.ssafy.ws.model.dto.Notice;
 import com.ssafy.ws.model.dto.request.NoticeInsertRequest;
 import com.ssafy.ws.model.dto.request.NoticeUpdateRequest;
+import com.ssafy.ws.model.dto.response.NoticeDetailResponse;
+import com.ssafy.ws.model.dto.response.NoticeListResponse;
 import com.ssafy.ws.model.service.MemberService;
 import com.ssafy.ws.model.service.NoticeService;
 import com.ssafy.ws.util.ImageUtil;
@@ -39,23 +40,27 @@ public class NoticeController {
 	private final MemberService memberService;
 
 	@GetMapping
-	public ResponseEntity<List<Notice>> findAll() {
-		return ResponseEntity.ok(service.findAll());
+	public ResponseEntity<List<NoticeListResponse>> findAll() {
+		List<Notice> notices = service.findAll();
+
+		List<NoticeListResponse> response = notices.stream().map(notice -> {
+			String memberName = memberService.findById(notice.getMemberId()).getName();
+			return new NoticeListResponse(notice.getNoticeId(), notice.getTitle(), memberName, notice.getCreateAt());
+		}).collect(Collectors.toList());
+
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<?> findById(@PathVariable int id) {
+	public ResponseEntity<NoticeDetailResponse> findById(@PathVariable int id) {
 		Notice notice = service.findById(id);
 		Member admin = memberService.findById(notice.getMemberId());
 
 		String imageBase64 = ImageUtil.convertImageBytesToBase64(admin.getProfileImage());
+		NoticeDetailResponse response = new NoticeDetailResponse(notice.getNoticeId(), notice.getTitle(),
+				notice.getContent(), admin.getName(), notice.getCreateAt(), imageBase64);
 
-		Map<String, Object> result = new HashMap<>();
-		result.put("notice", notice);
-		result.put("memberName", admin.getName());
-		result.put("profileImage", imageBase64);
-
-		return ResponseEntity.ok(result);
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping
@@ -97,5 +102,5 @@ public class NoticeController {
 			throw new ResponseStatusException(FORBIDDEN, "관리자 권한이 필요합니다.");
 		}
 	}
-	
+
 }
