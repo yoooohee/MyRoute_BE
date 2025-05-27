@@ -316,8 +316,6 @@ public class HotPlaceController {
 	 @GetMapping("/top-writers")
 	    public ResponseEntity<List<TopWriterResponse>> getTopWritersOfMonth() {
 	        List<TopWriterResponse> topWriters = hService.getTopWritersOfMonth();
-	        topWriters.add(new TopWriterResponse("aa", 3));
-	        topWriters.add(new TopWriterResponse("bb", 3));
 	        return ResponseEntity.ok(topWriters);
 	    }
 
