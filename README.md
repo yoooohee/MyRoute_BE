@@ -74,7 +74,7 @@
 
 | 구분 | 내용 |
 |------|------|
-| Language | Java, HTML, CSS, JavaScript |
+| Language | Java, HTML, CSS, JavaScript, Vue.js |
 | Framework | Spring Boot, MyBatis |
 | Database | MySQL |
 | API 연동 | SGIS 지도 API |
